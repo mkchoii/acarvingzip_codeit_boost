@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../models/groupModel'); 
+const db = require('../../models/groupModel'); // 경로 수정
 const groupController = express.Router(); 
 
 // 그룹 등록 라우터
