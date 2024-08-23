@@ -1,0 +1,40 @@
+@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
+
+/* 기본 폰트 설정 */
+body {
+  font-family: "Spoqa Han Sans Neo", "sans-serif";
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: #fafafa; /* 페이지기본 배경색*/
+  color: #282828; /* 텍스트 기본 색상*/
+}
+
+/* 글로벌 스타일 설정 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Spoqa Han Sans Neo", "sans-serif";
+  margin: 0;
+}
+
+p,
+a,
+input,
+button,
+textarea,
+select {
+  font-family: "Spoqa Han Sans Neo", "sans-serif";
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}

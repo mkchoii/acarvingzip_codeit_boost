@@ -1,0 +1,23 @@
+/* GNB.module.css */
+.gnb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #fff;
+  position: relative; /*버튼용*/
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  position: absolute;
+  right: 70px; /* 버튼을 오른쪽 끝에 고정 */
+  display: flex;
+  align-items: center;
+  transform: scale(0.9);
+  cursor: pointer;
+}
