@@ -1,10 +1,10 @@
 const express = require('express');
-const db = require('../../models/groupModel'); // 경로 수정
+const db = require('../models/groupModel'); 
 const groupController = express.Router(); 
 
 // 그룹 등록 라우터
 groupController.post('/', async (req, res) => {
-    const { name, image, description, isPublic, password } = req.body;
+    const { name, imageUrl, description, isPublic, password } = req.body; // imageUrl로 변경
 
     const sql = `
         INSERT INTO groups (name, image, description, isPublic, password)
@@ -13,7 +13,7 @@ groupController.post('/', async (req, res) => {
 
     try {
         const result = await new Promise((resolve, reject) => {
-            db.run(sql, [name, image, description, isPublic, password], function(err) {
+            db.run(sql, [name, imageUrl, description, isPublic, password], function(err) {
                 if (err) {
                     return reject(err); // 오류 발생 시 reject
                 }
@@ -31,7 +31,7 @@ groupController.post('/', async (req, res) => {
 // 그룹 수정 라우터
 groupController.put('/:groupId', async (req, res) => {
     const { groupId } = req.params;
-    const { password, name, image, description, isPublic } = req.body;
+    const { password, name, imageUrl, description, isPublic } = req.body; // imageUrl로 변경
 
     // 비밀번호 확인을 위한 쿼리
     const checkPasswordSql = `
@@ -59,7 +59,7 @@ groupController.put('/:groupId', async (req, res) => {
         `;
 
         const result = await new Promise((resolve, reject) => {
-            db.run(updateSql, [name, image, description, isPublic, groupId], function(err) {
+            db.run(updateSql, [name, imageUrl, description, isPublic, groupId], function(err) {
                 if (err) {
                     return reject(err);
                 }
@@ -128,3 +128,4 @@ groupController.delete('/:groupId', async (req, res) => {
 });
 
 module.exports = groupController; 
+ 

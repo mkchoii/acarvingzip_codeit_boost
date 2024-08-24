@@ -11,7 +11,7 @@ const createGroupsTable = () => {
         CREATE TABLE IF NOT EXISTS groups (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            image TEXT,
+            imageUrl TEXT NOT NULL,
             description TEXT,
             isPublic BOOLEAN NOT NULL,
             password TEXT NOT NULL
