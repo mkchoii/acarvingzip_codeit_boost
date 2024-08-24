@@ -15,22 +15,36 @@ function SearchBar({
   activeTab,
   onTabChange,
 }) {
+  const sortOptions = ["최신순", "게시물순", "공감순", "배지순"];
+
+  const mapFilterToSortBy = (filter) => {
+    switch (filter) {
+      case "최신순":
+        return "latest";
+      case "게시물순":
+        return "mostPosted";
+      case "공감순":
+        return "mostLiked";
+      case "배지순":
+        return "mostBadge";
+      default:
+        return "latest";
+    }
+  };
+
   return (
     <div className={styles.searchBar}>
       {/* 왼쪽의 공개/비공개 탭 */}
       <div className={styles.tabs}>
-        <div className={styles.tabButton} onClick={() => onTabChange("public")}>
-          {activeTab === "public" ? (
+        <div className={styles.tabButton} onClick={() => onTabChange(true)}>
+          {activeTab === true ? (
             <PublicActiveIcon className={styles.tabIcon} />
           ) : (
             <PublicInactiveIcon className={styles.tabIcon} />
           )}
         </div>
-        <div
-          className={styles.tabButton}
-          onClick={() => onTabChange("private")}
-        >
-          {activeTab === "private" ? (
+        <div className={styles.tabButton} onClick={() => onTabChange(false)}>
+          {activeTab === false ? (
             <PrivateActiveIcon className={styles.tabIcon} />
           ) : (
             <PrivateInactiveIcon className={styles.tabIcon} />
@@ -52,9 +66,9 @@ function SearchBar({
 
       {/* 오른쪽의 드롭다운 */}
       <Dropdown
-        options={["공감순", "댓글순", "최신순"]}
+        options={sortOptions}
         selectedOption={selectedFilter}
-        onOptionSelect={onFilterChange}
+        onOptionSelect={(option) => onFilterChange(mapFilterToSortBy(option))}
       />
     </div>
   );

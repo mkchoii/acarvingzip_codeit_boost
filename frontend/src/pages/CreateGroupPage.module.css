@@ -1,6 +1,4 @@
 .createGroupPage {
-  min-width: 700px;
-  max-width: 900px;
   margin: 0 auto;
   padding: 15px 20px;
   display: flex;
@@ -20,20 +18,23 @@
   cursor: pointer;
 }
 
+form {
+  width: 350px; /* 너비를 350px로 고정 */
+}
+
 .title {
   font-size: 24px;
   font-weight: 700;
   color: #282828;
-  margin: 40px 0; /* 로고와 타이틀 간의 간격*/
+  margin: 40px 0;
   text-align: center;
   width: 100%;
-  margin-left: -25px;
+  padding-right: 20px;
 }
 
 .formGroup {
-  margin-top: 0px;
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   padding: 0;
   box-sizing: border-box;
 }
@@ -47,7 +48,6 @@
 }
 
 .formGroup input[type="text"],
-.formGroup input[type="file"],
 .formGroup input[type="password"],
 .formGroup textarea {
   width: 100%;
@@ -63,12 +63,30 @@
   height: 100px;
 }
 
-.formGroup input[type="checkbox"] {
-  margin-right: 10px;
+.formGroup .fileInputWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
-.formGroup input[type="file"] {
-  padding: 8px;
+.fileInputWrapper input[type="text"] {
+  flex-grow: 1;
+  margin-right: 10px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.fileInputWrapper button {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  font-size: 14px;
+  border: 1px solid #282828;
+  background-color: #fafafa;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .toggleLabelWrapper {
@@ -106,4 +124,14 @@
 
 .submitButton:hover {
   background-color: #8d8d8d;
+}
+
+.inputError {
+  border-color: #ff5757;
+}
+
+.errorMessage {
+  color: #ff5757;
+  font-size: 12px;
+  margin-top: 5px;
 }

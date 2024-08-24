@@ -1,50 +1,81 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateGroupPage.module.css";
 import { ReactComponent as Logo } from "../assets/logo.svg";
 import { ReactComponent as ToggleActiveIcon } from "../assets/toggle_active.svg";
 import { ReactComponent as ToggleInactiveIcon } from "../assets/toggle_inactive.svg";
-import { createGroup } from "../api/groupApi"; // API 호출 함수
-import Modal from "../components/Modal"; // 모달 컴포넌트
+import { createGroup } from "../api/groupApi";
+import { uploadImage } from "../api/imageApi";
+import Modal from "../components/Modal";
 
 function CreateGroupPage() {
   const [isPublic, setIsPublic] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({ title: "", message: "" });
+  const [errorMessage, setErrorMessage] = useState(""); // 에러 메시지 상태 추가
 
-  const navigate = useNavigate(); // useNavigate 훅으로 navigate 초기화
+  const navigate = useNavigate();
 
   const handleToggleChange = () => {
     setIsPublic(!isPublic);
   };
 
   const handleLogoClick = () => {
-    navigate("/"); // 홈 화면으로 이동
+    navigate("/");
+  };
+
+  const handleFileSelect = () => {
+    const fileInput = document.getElementById("groupImage");
+    fileInput.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      try {
+        const imageUrl = await uploadImage(file);
+        document.getElementById("groupImageUrl").value = imageUrl; // 이미지 URL 설정
+      } catch (error) {
+        console.error("이미지 업로드 실패:", error);
+        alert("이미지 업로드에 실패했습니다.");
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 심플한 유효성 검사
     const groupName = e.target.groupName.value.trim();
-    const groupImage = e.target.groupImage.files[0];
+    const groupImageUrl = e.target.groupImageUrl.value.trim();
     const groupDescription = e.target.groupDescription.value.trim();
     const groupPassword = e.target.groupPassword.value.trim();
 
-    if (!groupName || !groupImage || !groupDescription || !groupPassword) {
+    // 특수문자 검증: 허용된 특수문자 외에는 경고 메시지 출력
+    const allowedSpecialChars = /^[a-zA-Z0-9!@#$%^_]+$/;
+
+    if (!allowedSpecialChars.test(groupName)) {
+      setErrorMessage("특수문자는 !@#$%^_ 만 사용하실 수 있습니다.");
+      return;
+    }
+
+    if (!groupName || !groupDescription || !groupPassword) {
       alert("모든 필드를 작성해주세요.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("name", groupName); // 그룹명 필드
-    formData.append("password", groupPassword); // 비밀번호 필드
-    formData.append("imageUrl", groupImage); // 이미지 파일 필드
-    formData.append("isPublic", isPublic); // 공개 여부 필드
-    formData.append("introduction", groupDescription); // 그룹 소개 필드
+    setErrorMessage(""); // 에러 메시지 초기화
+
+    const groupData = {
+      name: groupName,
+      password: groupPassword,
+      imageUrl: groupImageUrl,
+      isPublic: isPublic,
+      introduction: groupDescription,
+    };
 
     try {
-      await createGroup(formData);
+      await createGroup(groupData);
       setModalContent({
         title: "그룹 만들기 성공",
         message: "그룹이 성공적으로 등록되었습니다.",
@@ -62,7 +93,8 @@ function CreateGroupPage() {
   const closeModal = () => {
     setModalOpen(false);
     document.getElementById("groupName").value = "";
-    document.getElementById("groupImage").value = "";
+    document.getElementById("groupImageUrl").value = "";
+    document.getElementById("groupImage").value = ""; // 파일 선택 필드 초기화
     document.getElementById("groupDescription").value = "";
     document.getElementById("groupPassword").value = "";
     setIsPublic(true);
@@ -75,8 +107,6 @@ function CreateGroupPage() {
         <h1 className={styles.title}>그룹 만들기</h1>
       </div>
       <form onSubmit={handleSubmit} noValidate>
-        {" "}
-        {/* 기본 유효성 검사 비활성화 */}
         <div className={styles.formGroup}>
           <label htmlFor="groupName">그룹명</label>
           <input
@@ -84,16 +114,33 @@ function CreateGroupPage() {
             name="groupName"
             type="text"
             placeholder="그룹명을 입력하세요"
+            className={errorMessage ? styles.inputError : ""}
           />
+          {errorMessage && (
+            <div className={styles.errorMessage}>{errorMessage}</div>
+          )}
         </div>
         <div className={styles.formGroup}>
-          <label htmlFor="groupImage">대표 이미지</label>
-          <input
-            id="groupImage"
-            name="groupImage"
-            type="file"
-            accept="image/*"
-          />
+          <label htmlFor="groupImageUrl">대표 이미지</label>
+          <div className={styles.fileInputWrapper}>
+            <input
+              id="groupImageUrl"
+              name="groupImageUrl"
+              type="text"
+              placeholder="파일을 선택해주세요."
+              readOnly
+            />
+            <input
+              id="groupImage"
+              name="groupImage"
+              type="file"
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
+            <button type="button" onClick={handleFileSelect}>
+              파일 선택
+            </button>
+          </div>
         </div>
         <div className={styles.formGroup}>
           <label htmlFor="groupDescription">그룹 소개</label>
