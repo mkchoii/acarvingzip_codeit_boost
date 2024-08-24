@@ -1,0 +1,52 @@
+### 그룹 등록
+POST http://localhost:3000/api/groups
+Content-Type: application/json
+
+{
+	"name": "John Doe",
+	"password": "1234",
+	"imageUrl": "http://example.com/image.jpg",
+	"isPublic": true,
+	"introduction": "My name is John Doe"
+}
+
+### 게시글 등록
+POST http://localhost:3000/api/groups/1/posts
+Content-Type: application/json
+
+{
+	"nickname": "John Doe",
+	"title": "My First Post",
+	"content": "This is the content of my first post.",
+	"postPassword": "post1234",
+	"groupPassword": "1234",
+	"imageUrl": "http://example.com/image.jpg",
+	"tags": ["tag1", "tag2"],
+	"location": "New York",
+	"moment": "2024-02-21",
+	"isPublic": true
+}
+
+### 게시글 수정
+PUT http://localhost:3000/api/posts/1
+Content-Type: application/json
+
+{
+	"nickname": "James",
+	"title": "second title",
+	"content": "second content",
+	"postPassword": "post1234",
+	"imageUrl": "http://example.com/image.jpg",
+	"tags": [ "tag1", "tag2" ],
+	"location": "Seoul",
+	"moment": "2024-03-22",
+	"isPublic": true
+}
+
+### 게시글 삭제
+DELETE http://localhost:3000/api/posts/1
+Content-Type: application/json
+
+{
+  "postPassword": "post1234"
+}
