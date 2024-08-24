@@ -25,12 +25,23 @@ function CreateGroupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // 심플한 유효성 검사
+    const groupName = e.target.groupName.value.trim();
+    const groupImage = e.target.groupImage.files[0];
+    const groupDescription = e.target.groupDescription.value.trim();
+    const groupPassword = e.target.groupPassword.value.trim();
+
+    if (!groupName || !groupImage || !groupDescription || !groupPassword) {
+      alert("모든 필드를 작성해주세요.");
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("groupName", e.target.groupName.value);
-    formData.append("groupImage", e.target.groupImage.files[0]);
-    formData.append("groupDescription", e.target.groupDescription.value);
-    formData.append("isPublic", isPublic);
-    formData.append("groupPassword", e.target.groupPassword.value);
+    formData.append("name", groupName); // 그룹명 필드
+    formData.append("password", groupPassword); // 비밀번호 필드
+    formData.append("imageUrl", groupImage); // 이미지 파일 필드
+    formData.append("isPublic", isPublic); // 공개 여부 필드
+    formData.append("introduction", groupDescription); // 그룹 소개 필드
 
     try {
       await createGroup(formData);
@@ -63,19 +74,32 @@ function CreateGroupPage() {
         <Logo className={styles.logo} onClick={handleLogoClick} />
         <h1 className={styles.title}>그룹 만들기</h1>
       </div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
+        {" "}
+        {/* 기본 유효성 검사 비활성화 */}
         <div className={styles.formGroup}>
           <label htmlFor="groupName">그룹명</label>
-          <input id="groupName" type="text" placeholder="그룹명을 입력하세요" />
+          <input
+            id="groupName"
+            name="groupName"
+            type="text"
+            placeholder="그룹명을 입력하세요"
+          />
         </div>
         <div className={styles.formGroup}>
           <label htmlFor="groupImage">대표 이미지</label>
-          <input id="groupImage" type="file" />
+          <input
+            id="groupImage"
+            name="groupImage"
+            type="file"
+            accept="image/*"
+          />
         </div>
         <div className={styles.formGroup}>
           <label htmlFor="groupDescription">그룹 소개</label>
           <textarea
             id="groupDescription"
+            name="groupDescription"
             placeholder="그룹을 소개해 주세요"
           ></textarea>
         </div>
@@ -96,6 +120,7 @@ function CreateGroupPage() {
           <label htmlFor="groupPassword">비밀번호 생성</label>
           <input
             id="groupPassword"
+            name="groupPassword"
             type="password"
             placeholder="그룹 비밀번호를 생성해 주세요"
           />
