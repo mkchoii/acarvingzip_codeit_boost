@@ -3,6 +3,7 @@ import "./App.module.css";
 import "./App.font.css";
 import GNB from "./GNB";
 import SearchBar from "./SearchBar";
+import PublicGroupListPage from "../pages/PublicGroupListPage";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +29,11 @@ function App() {
         onFilterChange={handleFilterChange}
         activeTab={activeTab}
         onTabChange={handleTabChange}
+      />
+      <PublicGroupListPage
+        searchTerm={searchTerm}
+        selectedFilter={selectedFilter}
+        activeTab={activeTab}
       />
     </>
   );
