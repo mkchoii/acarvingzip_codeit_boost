@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 const groupController = require('./controllers/groupController'); // 그룹 컨트롤러 임포트
+const postController = require('./controllers/postController');
 
 const app = express();
 const port = 3000;
@@ -12,6 +12,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // API 라우터 설정
 app.use('/api/groups', groupController);
+app.use('/api/groups', postController);
+app.use('/api', postController);
 
 app.get('/', (req, res) => {
     res.send('그룹 관리 서버가 실행 중입니다.');
