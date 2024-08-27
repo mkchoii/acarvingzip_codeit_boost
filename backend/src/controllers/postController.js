@@ -22,6 +22,65 @@ postController.post('/:groupId/posts', async (req, res) => {
             });
         });
 
+        // 그룹의 게시글 수 증가
+        const updateGroupSql = 'UPDATE groups SET postCount = postCount + 1 WHERE id = ?';
+        db.run(updateGroupSql, [groupId], (err) => {
+            if (err) {
+                console.error("게시글 수 업데이트 오류:", err.message);
+            }
+        });
+
+        // 배지 획득 여부 확인
+        const badgeCheckSql = 'SELECT badges FROM groups WHERE id = ?';
+        db.get(badgeCheckSql, [groupId], (err, row) => {
+            if (err) {
+                console.error("배지 조회 오류:", err.message);
+            } else {
+                // 배지가 0이고 게시글 수가 20개 이상일 때만 배지 증가
+                if (row.badges === 0) {
+                    const badgeUpdateSql = `
+                        UPDATE groups 
+                        SET badges = badges + 1 
+                        WHERE id = ? AND postCount >= 20
+                    `;
+                    db.run(badgeUpdateSql, [groupId], (err) => {
+                        if (err) {
+                            console.error("배지 수 업데이트 오류:", err.message);
+                        }
+                    });
+                }
+            }
+        });
+
+        // 연속 7일 게시글 등록 배지 체크
+        const continuousPostCheckSql = `
+            SELECT COUNT(*) as dayCount 
+            FROM (
+                SELECT DISTINCT DATE(createdAt) as postDate 
+                FROM posts 
+                WHERE groupId = ? AND createdAt >= DATE('now', '-6 days')
+            )
+        `;
+        db.get(continuousPostCheckSql, [groupId], (err, row) => {
+            if (err) {
+                console.error("연속 게시글 조회 오류:", err.message);
+            } else {
+                // 연속 7일 게시글 등록 시 배지 증가
+                if (row.dayCount >= 7) {
+                    const continuousBadgeUpdateSql = `
+                        UPDATE groups 
+                        SET badges = badges + 1 
+                        WHERE id = ? AND badges < 2
+                    `;
+                    db.run(continuousBadgeUpdateSql, [groupId], (err) => {
+                        if (err) {
+                            console.error("연속 배지 수 업데이트 오류:", err.message);
+                        }
+                    });
+                }
+            }
+        });
+
         // 생성된 게시글 정보를 가져옴
         const newPost = await new Promise((resolve, reject) => {
             db.get('SELECT * FROM posts WHERE id = ?', [result], (err, row) => {

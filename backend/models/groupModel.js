@@ -14,7 +14,11 @@ const createGroupsTable = () => {
             imageUrl TEXT NOT NULL,
             description TEXT,
             isPublic BOOLEAN NOT NULL,
-            password TEXT NOT NULL
+            password TEXT NOT NULL,
+            likes INTEGER DEFAULT 0, 
+            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP, 
+            badges INTEGER DEFAULT 0, 
+            postCount INTEGER DEFAULT 0 
         )
     `;
 
