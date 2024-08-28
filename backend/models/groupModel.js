@@ -17,7 +17,7 @@ const createGroupsTable = () => {
             password TEXT NOT NULL,
             likes INTEGER DEFAULT 0, 
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP, 
-            badges INTEGER DEFAULT 0, 
+            badges TEXT DEFAULT '',  -- 배지를 문자열로 저장
             postCount INTEGER DEFAULT 0 
         )
     `;
@@ -34,4 +34,5 @@ const createGroupsTable = () => {
 // 테이블 생성 실행
 createGroupsTable();
 
+// 모듈 내보내기
 module.exports = db;

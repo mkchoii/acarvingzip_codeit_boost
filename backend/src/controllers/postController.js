@@ -31,50 +31,56 @@ postController.post('/:groupId/posts', async (req, res) => {
         });
 
         // 배지 획득 여부 확인
-        const badgeCheckSql = 'SELECT badges FROM groups WHERE id = ?';
+        const badgeCheckSql = 'SELECT badges, postCount FROM groups WHERE id = ?';
         db.get(badgeCheckSql, [groupId], (err, row) => {
             if (err) {
                 console.error("배지 조회 오류:", err.message);
             } else {
-                // 배지가 0이고 게시글 수가 20개 이상일 때만 배지 증가
-                if (row.badges === 0) {
+                const badges = row.badges || ''; // badges가 undefined일 경우 빈 문자열로 초기화
+
+                // 게시글 수가 20개 이상일 때 '게시글 장인' 배지 증가
+                if (!badges.includes('게시글 장인') && row.postCount >= 20) {
+                    const badgeName = '게시글 장인'; // 배지 이름 설정
                     const badgeUpdateSql = `
                         UPDATE groups 
-                        SET badges = badges + 1 
-                        WHERE id = ? AND postCount >= 20
+                        SET badges = ?
+                        WHERE id = ?
                     `;
-                    db.run(badgeUpdateSql, [groupId], (err) => {
+                    db.run(badgeUpdateSql, [badgeName, groupId], (err) => {
                         if (err) {
                             console.error("배지 수 업데이트 오류:", err.message);
                         }
                     });
                 }
-            }
-        });
 
-        // 연속 7일 게시글 등록 배지 체크
-        const continuousPostCheckSql = `
-            SELECT COUNT(*) as dayCount 
-            FROM (
-                SELECT DISTINCT DATE(createdAt) as postDate 
-                FROM posts 
-                WHERE groupId = ? AND createdAt >= DATE('now', '-6 days')
-            )
-        `;
-        db.get(continuousPostCheckSql, [groupId], (err, row) => {
-            if (err) {
-                console.error("연속 게시글 조회 오류:", err.message);
-            } else {
-                // 연속 7일 게시글 등록 시 배지 증가
-                if (row.dayCount >= 7) {
-                    const continuousBadgeUpdateSql = `
-                        UPDATE groups 
-                        SET badges = badges + 1 
-                        WHERE id = ? AND badges < 2
+                // '연속 게시글 등록' 배지 확인 및 업데이트
+                if (!badges.includes('연속 게시글 등록')) {
+                    const continuousPostCheckSql = `
+                        SELECT COUNT(*) as dayCount 
+                        FROM (
+                            SELECT DISTINCT DATE(createdAt) as postDate 
+                            FROM posts 
+                            WHERE groupId = ? AND createdAt >= DATE('now', '-6 days')
+                        )
                     `;
-                    db.run(continuousBadgeUpdateSql, [groupId], (err) => {
+                    db.get(continuousPostCheckSql, [groupId], (err, row) => {
                         if (err) {
-                            console.error("연속 배지 수 업데이트 오류:", err.message);
+                            console.error("연속 게시글 조회 오류:", err.message);
+                        } else {
+                            // 연속 게시글 등록 시 배지 증가
+                            if (row.dayCount >= 7) {
+                                const continuousBadgeName = '연속 게시글 등록'; // 배지 이름 설정
+                                const continuousBadgeUpdateSql = `
+                                    UPDATE groups 
+                                    SET badges = ?
+                                    WHERE id = ? AND badges NOT LIKE '%연속 게시글 등록%'
+                                `;
+                                db.run(continuousBadgeUpdateSql, [continuousBadgeName, groupId], (err) => {
+                                    if (err) {
+                                        console.error("연속 배지 수 업데이트 오류:", err.message);
+                                    }
+                                });
+                            }
                         }
                     });
                 }
@@ -97,6 +103,7 @@ postController.post('/:groupId/posts', async (req, res) => {
         res.status(400).json({ message: '잘못된 요청입니다' });
     }
 });
+
 
 // 게시글 수정
 postController.put('/posts/:postId', async (req, res) => {

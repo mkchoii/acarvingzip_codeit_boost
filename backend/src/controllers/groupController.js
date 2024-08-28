@@ -35,14 +35,15 @@ groupController.post('/', async (req, res) => {
                 const diffTime = Math.abs(currentDate - createdAt);
                 const diffYears = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365)); // 연도 차이 계산
 
-                // 배지가 0이고 1년이 지났을 때만 배지 증가
-                if (row.badges === 0 && diffYears >= 1) {
+                // 배지가 없고 1년이 지났을 때만 '1년 기념' 배지 증가
+                if (!row.badges.includes('1년 기념') && diffYears >= 1) {
+                    const badgeName = '1년 기념'; // 배지 이름 설정
                     const badgeUpdateSql = `
                         UPDATE groups 
-                        SET badges = badges + 1 
+                        SET badges = ?
                         WHERE id = ?
                     `;
-                    db.run(badgeUpdateSql, [result], (err) => {
+                    db.run(badgeUpdateSql, [badgeName, result], (err) => {
                         if (err) {
                             console.error("배지 수 업데이트 오류:", err.message);
                         }
@@ -71,6 +72,7 @@ groupController.get('/', async (req, res) => {
         whereClauseAdded = true; // WHERE 절이 추가되었음을 표시
     } else {
         sql += ' WHERE isPublic = 1'; // 공개 그룹 필터링
+        whereClauseAdded = true; // WHERE 절이 추가되었음을 표시
     }
 
     // 그룹 이름으로 검색 기능 추가
@@ -130,7 +132,7 @@ groupController.get('/', async (req, res) => {
                     description: row.description,
                     isPublic: row.isPublic,
                     dDay: diffDays,
-                    badges: row.badges,
+                    badges: row.badges ? row.badges.split(',').length : 0, // 배지 개수
                     posts: postCounts[index], 
                     likes: row.likes 
                 };
@@ -141,6 +143,7 @@ groupController.get('/', async (req, res) => {
                     name: row.name,
                     isPublic: row.isPublic,
                     dDay: diffDays,
+                    badges: row.badges ? row.badges.split(',').length : 0, // 배지 개수
                     posts: postCounts[index], 
                     likes: row.likes 
                 };
@@ -171,14 +174,15 @@ groupController.post('/:groupId/like', (req, res) => {
             if (err) {
                 console.error("배지 조회 오류:", err.message);
             } else {
-                // 배지가 0이고 공감 수가 10,000개 이상일 때만 배지 증가
-                if (row.badges === 0 && row.likes >= 10000) {
+                // 배지가 없고 공감 수가 10,000개 이상일 때만 '인기 그룹' 배지 증가
+                if (!row.badges.includes('인기 그룹') && row.likes >= 10000) {
+                    const badgeName = '인기 그룹'; // 배지 이름 설정
                     const badgeUpdateSql = `
                         UPDATE groups 
-                        SET badges = badges + 1 
+                        SET badges = ?
                         WHERE id = ?
                     `;
-                    db.run(badgeUpdateSql, [groupId], (err) => {
+                    db.run(badgeUpdateSql, [badgeName, groupId], (err) => {
                         if (err) {
                             console.error("배지 수 업데이트 오류:", err.message);
                         }
@@ -255,5 +259,127 @@ groupController.delete('/:groupId', (req, res) => {
     });
 });
 
-module.exports = groupController;
+// 비공개 그룹 비밀번호 확인 라우터
+groupController.post('/:id/verify-password', async (req, res) => {
+    const groupId = req.params.id; // 그룹 ID
+    const { password } = req.body; // 비밀번호를 요청 본문에서 받음
 
+    try {
+        // 그룹 정보 조회
+        const group = await new Promise((resolve, reject) => {
+            db.get('SELECT * FROM groups WHERE id = ?', [groupId], (err, row) => {
+                if (err) {
+                    console.error("그룹 조회 오류:", err.message);
+                    return reject(err);
+                }
+                resolve(row);
+            });
+        });
+
+        // 그룹이 존재하지 않는 경우
+        if (!group) {
+            return res.status(404).json({ error: '그룹을 찾을 수 없습니다.' });
+        }
+
+        // 비공개 그룹의 경우 비밀번호 체크
+        if (group.isPublic || password !== group.password) {
+            return res.status(403).json({ error: '비밀번호가 일치하지 않거나 그룹이 공개입니다.' });
+        }
+
+        // 비밀번호가 일치할 경우 성공 응답
+        res.status(200).json({ message: '비밀번호가 확인되었습니다.' });
+    } catch (err) {
+        console.error("비밀번호 확인 오류:", err.message);
+        res.status(500).json({ error: '비밀번호 확인에 실패했습니다.' });
+    }
+});
+
+// 그룹 상세 조회 라우터
+groupController.get('/:id', async (req, res) => {
+    const groupId = req.params.id; // 그룹 ID
+
+    try {
+        // 그룹 정보 조회
+        const group = await new Promise((resolve, reject) => {
+            db.get('SELECT * FROM groups WHERE id = ?', [groupId], (err, row) => {
+                if (err) {
+                    console.error("그룹 조회 오류:", err.message);
+                    return reject(err);
+                }
+                resolve(row);
+            });
+        });
+
+        // 그룹이 존재하지 않는 경우
+        if (!group) {
+            return res.status(404).json({ error: '그룹을 찾을 수 없습니다.' });
+        }
+
+        // 게시글 수 조회
+        const postCount = await new Promise((resolve, reject) => {
+            db.get('SELECT COUNT(*) as postCount FROM posts WHERE groupId = ?', [groupId], (err, postRow) => {
+                if (err) {
+                    console.error("게시글 수 조회 오류:", err.message);
+                    return resolve(0); // 오류 발생 시 0으로 설정
+                }
+                resolve(postRow.postCount);
+            });
+        });
+
+        // 게시물 목록 조회
+        const posts = await new Promise((resolve, reject) => {
+            db.all('SELECT * FROM posts WHERE groupId = ? ORDER BY createdAt DESC', [groupId], (err, rows) => {
+                if (err) {
+                    console.error("게시물 목록 조회 오류:", err.message);
+                    return reject(err);
+                }
+                resolve(rows);
+            });
+        });
+
+        // 디데이 계산
+        const currentDate = new Date();
+        const createdAt = new Date(group.createdAt);
+        const diffTime = Math.abs(currentDate - createdAt);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        // 배지 목록 계산
+        const badgeNames = {
+            '연속 게시글 등록': '연속 게시글 등록',  // 7일 연속 게시글 등록
+            '게시글 장인': '게시글 장인',        // 게시글 수 20개 이상
+            '1년 기념': '1년 기념',          // 1년 달성
+            '인기 그룹': '인기 그룹'          // 공감 1만개 이상
+        };
+
+        const badges = []; // 배지 목록을 저장할 배열
+        if (group.badges) {
+            const groupBadges = group.badges.split(','); // 문자열을 배열로 변환
+            groupBadges.forEach(badge => {
+                if (badgeNames[badge.trim()]) {
+                    badges.push(badgeNames[badge.trim()]); // 배지 이름 추가
+                }
+            });
+        }
+
+        // 그룹 상세 정보 응답
+        const response = {
+            id: group.id,
+            name: group.name,
+            imageUrl: group.imageUrl,
+            description: group.description,
+            isPublic: group.isPublic,
+            dDay: diffDays,
+            badges: badges,
+            posts: postCount, // 게시글 수
+            postList: posts, // 게시물 목록
+            likes: group.likes // 그룹 공감수
+        };
+
+        res.status(200).json(response);
+    } catch (err) {
+        console.error("그룹 상세 조회 오류:", err.message);
+        res.status(500).json({ error: '그룹 상세 정보를 조회하는 데 실패했습니다.' });
+    }
+});
+
+module.exports = groupController;
