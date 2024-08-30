@@ -414,4 +414,55 @@ postController.post('/:postId/verify-password', async (req, res) => {
   }
 });
 
+// 게시글 공감하기
+postController.post('/:postId/like', async (req, res) => {
+  const { postId } = req.params;
+
+  // 게시글이 존재하는지 확인하는 쿼리
+  const checkPostSql = `
+      SELECT id
+      FROM posts
+      WHERE id = ?
+  `;
+
+  // 게시글 공감 수 증가 쿼리
+  const updateLikeCountSql = `
+      UPDATE posts
+      SET likeCount = likeCount + 1
+      WHERE id = ?
+  `;
+
+  try {
+      // 게시글 존재 여부 확인
+      const post = await new Promise((resolve, reject) => {
+          db.get(checkPostSql, [postId], (err, row) => {
+              if (err) {
+                  return reject(err);
+              }
+              resolve(row);
+          });
+      });
+
+      // 게시글이 존재하지 않는 경우
+      if (!post) {
+          return res.status(404).json({ message: '존재하지 않습니다' });
+      }
+
+      // 게시글 공감 수 증가
+      await new Promise((resolve, reject) => {
+          db.run(updateLikeCountSql, [postId], function(err) {
+              if (err) {
+                  return reject(err);
+              }
+              resolve(this.changes);
+          });
+      });
+
+      res.status(200).json({ message: '게시글 공감하기 성공' });
+  } catch (err) {
+      console.error("게시글 공감 오류:", err.message);
+      res.status(500).json({ message: '게시글 공감하기에 실패했습니다.' });
+  }
+});
+
 module.exports = postController;
