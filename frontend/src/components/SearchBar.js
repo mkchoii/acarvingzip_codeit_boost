@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ReactComponent as PublicActiveIcon } from "../assets/public_active.svg";
 import { ReactComponent as PublicInactiveIcon } from "../assets/public_inactive.svg";
 import { ReactComponent as PrivateActiveIcon } from "../assets/private_active.svg";
@@ -15,33 +15,45 @@ function SearchBar({
   activeTab,
   onTabChange,
 }) {
-  const sortOptions = [
-    { label: "최신순", value: "latest" },
-    { label: "게시물순", value: "mostPosted" },
-    { label: "공감순", value: "mostLiked" },
-    { label: "배지순", value: "mostBadge" },
-  ];
-
-  const [currentFilter, setCurrentFilter] = useState(
-    selectedFilter || "mostLiked"
+  // sortOptions 배열을 useMemo로 메모이제이션
+  const sortOptions = useMemo(
+    () => [
+      { label: "최신순", value: "latest" },
+      { label: "게시물순", value: "mostPosted" },
+      { label: "공감순", value: "mostLiked" },
+      { label: "배지순", value: "mostBadge" },
+    ],
+    []
   );
 
+  const [currentFilter, setCurrentFilter] = useState("mostLiked");
+
+  // 필터가 변경될 때 currentFilter를 업데이트
   useEffect(() => {
-    // selectedFilter가 변경되면 currentFilter를 업데이트
-    if (selectedFilter && selectedFilter !== currentFilter) {
-      setCurrentFilter(selectedFilter);
+    if (selectedFilter !== currentFilter) {
+      setCurrentFilter(selectedFilter || "mostLiked");
     }
   }, [selectedFilter, currentFilter]);
 
+  // 현재 탭이 변경될 때 searchTerm과 currentFilter를 초기화
   useEffect(() => {
-    // 필터와 탭 상태 초기화
-    if (!selectedFilter) {
-      onFilterChange("mostLiked");
-    }
-    if (activeTab === undefined) {
-      onTabChange(true);
-    }
-  }, [selectedFilter, activeTab, onFilterChange, onTabChange]);
+    setCurrentFilter("mostLiked");
+    onSearchChange(""); // 검색어 초기화
+  }, [activeTab, onSearchChange]);
+
+  // 필터 옵션을 선택할 때
+  const handleOptionSelect = useCallback(
+    (selectedLabel) => {
+      const selectedValue =
+        sortOptions.find((option) => option.label === selectedLabel)?.value ||
+        "mostLiked";
+      if (selectedValue !== currentFilter) {
+        setCurrentFilter(selectedValue);
+        onFilterChange(selectedValue); // 필터 변경 함수 호출
+      }
+    },
+    [currentFilter, onFilterChange, sortOptions] // 'sortOptions'는 useMemo로 안정화됨
+  );
 
   const selectedOptionLabel =
     sortOptions.find((option) => option.value === currentFilter)?.label ||
@@ -51,10 +63,12 @@ function SearchBar({
     <div className={styles.searchBar}>
       <div className={styles.tabs}>
         <div
-          className={`${styles.tabButton} ${activeTab ? styles.activeTab : ""}`}
-          onClick={() => onTabChange(true)}
+          className={`${styles.tabButton} ${
+            activeTab === "public" ? styles.activeTab : ""
+          }`}
+          onClick={() => onTabChange("public")}
         >
-          {activeTab ? (
+          {activeTab === "public" ? (
             <PublicActiveIcon className={styles.tabIcon} />
           ) : (
             <PublicInactiveIcon className={styles.tabIcon} />
@@ -62,11 +76,11 @@ function SearchBar({
         </div>
         <div
           className={`${styles.tabButton} ${
-            !activeTab ? styles.activeTab : ""
+            activeTab === "private" ? styles.activeTab : ""
           }`}
-          onClick={() => onTabChange(false)}
+          onClick={() => onTabChange("private")}
         >
-          {!activeTab ? (
+          {activeTab === "private" ? (
             <PrivateActiveIcon className={styles.tabIcon} />
           ) : (
             <PrivateInactiveIcon className={styles.tabIcon} />
@@ -88,15 +102,7 @@ function SearchBar({
       <Dropdown
         options={sortOptions.map((option) => option.label)}
         selectedOption={selectedOptionLabel}
-        onOptionSelect={(selectedLabel) => {
-          const selectedValue =
-            sortOptions.find((option) => option.label === selectedLabel)
-              ?.value || "mostLiked";
-          if (selectedValue !== currentFilter) {
-            setCurrentFilter(selectedValue);
-            onFilterChange(selectedValue); // 필터 변경 알림
-          }
-        }}
+        onOptionSelect={handleOptionSelect}
       />
     </div>
   );
