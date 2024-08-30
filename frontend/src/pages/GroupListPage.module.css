@@ -1,16 +1,13 @@
 .groupListPage {
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1200px; /* 페이지의 최대 너비를 설정 */
+  margin: 0 auto; /* 페이지를 중앙에 위치 */
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .tabContent {
-  width: 100%;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin-top: 20px;
+  flex-wrap: wrap; /* 플렉스 박스를 사용해 카드들을 감싸고 줄 바꿈을 허용 */
+  gap: 20px; /* 카드 간의 간격을 설정 */
+  justify-content: flex-start; /* 카드들을 왼쪽 정렬 (오른쪽으로 배치되지 않도록) */
+  width: 100%; /* 탭 컨텐츠의 너비를 100%로 설정 */
 }

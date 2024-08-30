@@ -1,9 +1,16 @@
+.pageContainer {
+  padding: 0 60px;
+  padding-bottom: 60px;
+}
+
 .groupList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  padding: 20px;
+  column-count: 4; /* Masonry 레이아웃을 위한 열의 수 */
+  column-gap: 20px; /* 각 열 사이의 간격 */
+}
+
+.groupList > div {
+  break-inside: avoid; /* 요소가 열 사이에서 분할되지 않도록 방지 */
+  margin-bottom: 20px; /* 카드 사이의 간격 */
 }
 
 .emptyState {
@@ -42,4 +49,38 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.loadingMessage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  height: 100vh; /* Viewport height */
+  font-size: 16px;
+  color: #282828;
+}
+
+/* 더보기 버튼 */
+.loadMoreButton {
+  box-sizing: border-box;
+  margin: 60px auto 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  width: 1500px;
+  height: 40px;
+  background: #fafafa;
+  border: 1px solid #282828;
+  border-radius: 6px;
+  color: #282828;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* 호버 시 배경색 전환 효과 */
+}
+
+.loadMoreButton:hover {
+  background-color: #f4f4f4;
 }
