@@ -174,7 +174,7 @@ postController.get('/:groupId/posts', async (req, res) => {
 });
 
 // 게시글 수정
-postController.put('/posts/:postId', async (req, res) => {
+postController.put('/:postId', async (req, res) => {
     const { postId } = req.params;
     const { nickname, title, content, postPassword, imageUrl, tags, location, moment, isPublic } = req.body;
 
@@ -251,7 +251,7 @@ postController.put('/posts/:postId', async (req, res) => {
 });
 
 // 게시글 삭제
-postController.delete('/posts/:postId', async (req, res) => {
+postController.delete('/:postId', async (req, res) => {
     const { postId } = req.params;
     const { postPassword } = req.body;
 
@@ -328,7 +328,7 @@ postController.delete('/posts/:postId', async (req, res) => {
 });
 
 // 게시글 상세 정보 조회
-postController.get('/posts/:postId', async (req, res) => {
+postController.get('/:postId', async (req, res) => {
   const { postId } = req.params;
 
   // 게시글 ID 유효성 검사
@@ -366,6 +366,51 @@ postController.get('/posts/:postId', async (req, res) => {
   } catch (err) {
       console.error("게시글 상세 정보 조회 오류:", err.message);
       res.status(500).json({ message: '게시글 조회에 실패했습니다.' });
+  }
+});
+
+// 게시글 조회 권한 확인
+postController.post('/:postId/verify-password', async (req, res) => {
+  const { postId } = req.params;
+  const { password } = req.body;
+
+  // 요청 본문 검증
+  if (!password) {
+      return res.status(400).json({ message: '비밀번호가 필요합니다' });
+  }
+
+  // 게시글 비밀번호 확인 쿼리
+  const sql = `
+      SELECT postPassword
+      FROM posts
+      WHERE id = ?
+  `;
+
+  try {
+      // 게시글 비밀번호 조회
+      const post = await new Promise((resolve, reject) => {
+          db.get(sql, [postId], (err, row) => {
+              if (err) {
+                  return reject(err);
+              }
+              resolve(row);
+          });
+      });
+
+      // 게시글이 존재하지 않는 경우
+      if (!post) {
+          return res.status(404).json({ message: '게시글이 존재하지 않습니다' });
+      }
+
+      // 비밀번호 확인
+      if (post.postPassword !== password) {
+          return res.status(401).json({ message: '비밀번호가 틀렸습니다' });
+      }
+
+      res.status(200).json({ message: '비밀번호가 확인되었습니다' });
+  } catch (err) {
+      console.error("비밀번호 확인 오류:", err.message);
+      res.status(500).json({ message: '비밀번호 확인에 실패했습니다.' });
   }
 });
 

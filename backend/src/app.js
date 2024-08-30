@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/groups', groupController);
 app.use('/api/image', imageController);
 app.use('/api/groups', postController);
-app.use('/api', postController); 
+app.use('/api/posts', postController); 
 
 app.get('/', (req, res) => {
     res.send('그룹 관리 서버가 실행 중입니다.');
