@@ -58,3 +58,29 @@ export const fetchGroups = async (
     throw error;
   }
 };
+
+// 비공개 그룹 접근 권한 확인
+export const checkPrivateGroupAccess = async (groupId, password) => {
+  try {
+    const response = await fetch(`/api/groups/${groupId}/access`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error from server:", errorData);
+      throw new Error(
+        errorData.message || "비공개 그룹 접근 권한 확인에 실패했습니다."
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
