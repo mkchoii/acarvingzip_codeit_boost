@@ -465,4 +465,42 @@ postController.post('/:postId/like', async (req, res) => {
   }
 });
 
+// 게시글 공개 여부 확인
+postController.get('/:postId/is-public', async (req, res) => {
+  const { postId } = req.params;
+
+  // 게시글 공개 여부를 확인하는 쿼리
+  const checkPublicSql = `
+      SELECT id, isPublic
+      FROM posts
+      WHERE id = ?
+  `;
+
+  try {
+      // 게시글 공개 여부 조회
+      const post = await new Promise((resolve, reject) => {
+          db.get(checkPublicSql, [postId], (err, row) => {
+              if (err) {
+                  return reject(err);
+              }
+              resolve(row);
+          });
+      });
+
+      // 게시글이 존재하지 않는 경우
+      if (!post) {
+          return res.status(404).json({ message: '존재하지 않는 게시글입니다' });
+      }
+
+      // 공개 여부와 게시글 ID 반환
+      res.status(200).json({
+          id: post.id,
+          isPublic: post.isPublic
+      });
+  } catch (err) {
+      console.error("게시글 공개 여부 확인 오류:", err.message);
+      res.status(500).json({ message: '게시글 공개 여부 확인에 실패했습니다.' });
+  }
+});
+
 module.exports = postController;

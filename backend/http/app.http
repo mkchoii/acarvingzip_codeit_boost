@@ -101,3 +101,6 @@ Content-Type: application/json
 
 ### 게시글 공감하기
 POST http://localhost:3000/api/posts/25/like
+
+### 게시글 공개 여부 확인
+GET http://localhost:3000/api/posts/25/is-public
