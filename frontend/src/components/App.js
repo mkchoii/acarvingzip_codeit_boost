@@ -4,6 +4,7 @@ import "./App.font.css";
 import GNB from "./GNB";
 import SearchBar from "./SearchBar";
 import PublicGroupListPage from "../pages/PublicGroupListPage";
+import PrivateGroupListPage from "../pages/PrivateGroupListPage"; // PrivateGroupListPage 가져오기
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,11 +31,19 @@ function App() {
         activeTab={activeTab}
         onTabChange={handleTabChange}
       />
-      <PublicGroupListPage
-        searchTerm={searchTerm}
-        selectedFilter={selectedFilter}
-        activeTab={activeTab}
-      />
+      {activeTab === "public" ? (
+        <PublicGroupListPage
+          searchTerm={searchTerm}
+          selectedFilter={selectedFilter}
+          activeTab={activeTab}
+        />
+      ) : (
+        <PrivateGroupListPage
+          searchTerm={searchTerm}
+          selectedFilter={selectedFilter}
+          activeTab={activeTab}
+        />
+      )}
     </>
   );
 }

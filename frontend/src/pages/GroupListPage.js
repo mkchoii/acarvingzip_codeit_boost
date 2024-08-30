@@ -5,46 +5,61 @@ import PrivateGroupListPage from "./PrivateGroupListPage";
 import styles from "./GroupListPage.module.css";
 
 function GroupListPage() {
-  const [activeTab, setActiveTab] = useState(true); // 기본 탭은 공개 그룹 (true)
-  const [searchTerm, setSearchTerm] = useState(""); // 검색어
-  const [filter, setFilter] = useState("mostLiked"); // 기본 필터는 mostLiked (공감순)
+  const [activeTab, setActiveTab] = useState("public");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [publicFilter, setPublicFilter] = useState("mostLiked"); // 초기값 설정
+  const [privateFilter, setPrivateFilter] = useState("mostLiked"); // 초기값 설정
 
-  const handleTabChange = (isPublic) => {
-    setActiveTab(isPublic);
+  // 탭 변경 시 필터 상태 초기화
+  useEffect(() => {
+    if (activeTab === "public") {
+      setPublicFilter("mostLiked");
+    } else if (activeTab === "private") {
+      setPrivateFilter("mostLiked");
+    }
+    setSearchTerm("");
+  }, [activeTab]);
+
+  const handleTabChange = (tab) => {
+    console.log("탭 변경:", tab);
+    setActiveTab(tab);
   };
 
   const handleSearchChange = (term) => {
+    console.log("검색어 변경:", term);
     setSearchTerm(term);
   };
 
   const handleFilterChange = (selectedFilter) => {
-    console.log("Selected Filter in GroupListPage:", selectedFilter);
-    setFilter(selectedFilter);
+    console.log("필터 변경:", selectedFilter, "활성 탭:", activeTab);
+    if (activeTab === "public") {
+      setPublicFilter(selectedFilter);
+    } else if (activeTab === "private") {
+      setPrivateFilter(selectedFilter);
+    }
   };
-
-  useEffect(() => {
-    console.log("Filter in GroupListPage after update:", filter);
-  }, [filter]);
 
   return (
     <div className={styles.groupListPage}>
       <SearchBar
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
-        selectedFilter={filter}
+        selectedFilter={activeTab === "public" ? publicFilter : privateFilter}
         onFilterChange={handleFilterChange}
         activeTab={activeTab}
         onTabChange={handleTabChange}
       />
       <div className={styles.tabContent}>
-        {activeTab ? (
+        {activeTab === "public" ? (
           <PublicGroupListPage
-            key={filter} // 필터가 바뀔 때마다 컴포넌트가 새로 마운트되도록 key를 설정
             searchTerm={searchTerm}
-            filter={filter}
+            selectedFilter={publicFilter}
           />
         ) : (
-          <PrivateGroupListPage searchTerm={searchTerm} filter={filter} />
+          <PrivateGroupListPage
+            searchTerm={searchTerm}
+            selectedFilter={privateFilter}
+          />
         )}
       </div>
     </div>

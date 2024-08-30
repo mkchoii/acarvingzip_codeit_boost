@@ -133,6 +133,62 @@ const mockGroups = [
     createdAt: "2023-01-15T07:47:49.803Z",
     introduction: "프리지아 향기 속에서 꿈을 키워가는 우리들.",
   },
+  // 비공개 그룹
+  {
+    id: 13,
+    name: "비밀의 정원",
+    image: null, // 이미지 없음
+    isPublic: false,
+    likeCount: 1400,
+    badgeCount: 3,
+    postCount: 12,
+    createdAt: "2023-09-15T07:47:49.803Z",
+    introduction: "아름다운 비밀의 정원에서 마음의 평화를 찾는 시간.",
+  },
+  {
+    id: 14,
+    name: "숨겨진 연꽃",
+    image: null, // 이미지 없음
+    isPublic: false,
+    likeCount: 1200,
+    badgeCount: 4,
+    postCount: 10,
+    createdAt: "2023-12-20T07:47:49.803Z",
+    introduction: "숨겨진 연못에서 발견한 연꽃의 아름다움.",
+  },
+  {
+    id: 15,
+    name: "프라이빗 라벤더",
+    image: null, // 이미지 없음
+    isPublic: false,
+    likeCount: 2000,
+    badgeCount: 2,
+    postCount: 7,
+    createdAt: "2024-05-30T07:47:49.803Z",
+    introduction: "라벤더 향기 속에서 비밀스러운 휴식을.",
+  },
+  {
+    id: 16,
+    name: "미스터리 코스모스",
+    image: null, // 이미지 없음
+    isPublic: false,
+    likeCount: 900,
+    badgeCount: 5,
+    postCount: 12,
+    createdAt: "2023-05-10T07:47:49.803Z",
+    introduction: "코스모스 꽃밭에서 펼쳐지는 비밀스러운 이야기.",
+  },
+  {
+    id: 17,
+    name: "시크릿 튤립",
+    image: null, // 이미지 없음
+    isPublic: false,
+    likeCount: 50,
+    badgeCount: 1,
+    postCount: 2,
+    createdAt: "2023-11-10T07:47:49.803Z",
+    introduction: "튤립 꽃밭에서 펼쳐지는 비밀스러운 이야기.",
+  },
 ];
 
 export default mockGroups;

@@ -1,17 +1,17 @@
 import React, { useReducer, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // useNavigate 훅 임포트
 import GroupCard from "../components/GroupCard";
-import styles from "./PublicGroupListPage.module.css";
-import emptyGroupImage from "../assets/emptyGroup.svg";
-import mockGroups from "../api/mockGroups";
+import styles from "./PrivateGroupListPage.module.css";
+import emptyGroupImage from "../assets/emptyGroup.svg"; // 이미지 파일 임포트
+import mockGroups from "../api/mockGroups"; // 모크 그룹 데이터 가져오기
 
 const initialState = {
   groups: [],
   loading: true,
   error: false,
-  displayedGroups: [],
-  itemsToShow: 10,
-  allItemsLoaded: false,
+  displayedGroups: [], // 페이지에 표시할 그룹들
+  itemsToShow: 10, // 처음에 보여줄 항목 수
+  allItemsLoaded: false, // 모든 항목이 로드되었는지 여부를 나타내는 플래그
 };
 
 function reducer(state, action) {
@@ -51,28 +51,29 @@ function reducer(state, action) {
   }
 }
 
-function PublicGroupListPage({
+function PrivateGroupListPage({
   searchTerm = "",
   selectedFilter = "mostLiked",
 }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { groups, loading, error, displayedGroups, allItemsLoaded } = state;
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 훅 사용
 
   useEffect(() => {
     const fetchGroups = async () => {
-      console.log("PublicGroupListPage 데이터 가져오기 시작");
       dispatch({ type: "FETCH_INIT" });
+      console.log("PrivateGroupListPage 데이터 가져오기 시작");
 
       try {
-        let fetchedGroups = mockGroups.filter((group) => group.isPublic);
-        console.log("공개 그룹 필터링 후:", fetchedGroups);
+        // 비공개 그룹만 필터링
+        let fetchedGroups = mockGroups.filter((group) => !group.isPublic);
+        console.log("비공개 그룹 필터링 후:", fetchedGroups);
 
+        // 검색어 필터링
         if (searchTerm) {
           fetchedGroups = fetchedGroups.filter((group) =>
             group.name.toLowerCase().includes(searchTerm.toLowerCase())
           );
-          console.log("검색어 필터링 후:", fetchedGroups);
         }
 
         const sortBy = {
@@ -84,7 +85,6 @@ function PublicGroupListPage({
 
         const sortFunction = sortBy[selectedFilter] || sortBy.mostLiked;
         fetchedGroups.sort(sortFunction);
-
         console.log("정렬 후 그룹:", fetchedGroups);
 
         dispatch({ type: "FETCH_SUCCESS", payload: fetchedGroups });
@@ -127,7 +127,7 @@ function PublicGroupListPage({
         />
         <button
           className={styles.createButton}
-          onClick={() => navigate("/create-group")}
+          onClick={() => navigate("/create-group")} // 그룹 만들기 버튼 클릭 시 페이지 이동
         >
           그룹 만들기
         </button>
@@ -151,4 +151,4 @@ function PublicGroupListPage({
   );
 }
 
-export default PublicGroupListPage;
+export default PrivateGroupListPage;
