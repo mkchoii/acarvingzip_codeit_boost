@@ -35,12 +35,6 @@ function SearchBar({
     }
   }, [selectedFilter, currentFilter]);
 
-  // 현재 탭이 변경될 때 searchTerm과 currentFilter를 초기화
-  useEffect(() => {
-    setCurrentFilter("mostLiked");
-    onSearchChange(""); // 검색어 초기화
-  }, [activeTab, onSearchChange]);
-
   // 필터 옵션을 선택할 때
   const handleOptionSelect = useCallback(
     (selectedLabel) => {
@@ -52,7 +46,7 @@ function SearchBar({
         onFilterChange(selectedValue); // 필터 변경 함수 호출
       }
     },
-    [currentFilter, onFilterChange, sortOptions] // 'sortOptions'는 useMemo로 안정화됨
+    [currentFilter, onFilterChange, sortOptions]
   );
 
   const selectedOptionLabel =

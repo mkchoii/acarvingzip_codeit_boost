@@ -7,17 +7,12 @@ import styles from "./GroupListPage.module.css";
 function GroupListPage() {
   const [activeTab, setActiveTab] = useState("public");
   const [searchTerm, setSearchTerm] = useState("");
-  const [publicFilter, setPublicFilter] = useState("mostLiked"); // 초기값 설정
-  const [privateFilter, setPrivateFilter] = useState("mostLiked"); // 초기값 설정
+  const [publicFilter, setPublicFilter] = useState("mostLiked");
+  const [privateFilter, setPrivateFilter] = useState("mostLiked");
 
   // 탭 변경 시 필터 상태 초기화
   useEffect(() => {
-    if (activeTab === "public") {
-      setPublicFilter("mostLiked");
-    } else if (activeTab === "private") {
-      setPrivateFilter("mostLiked");
-    }
-    setSearchTerm("");
+    setSearchTerm(""); // 검색어 초기화
   }, [activeTab]);
 
   const handleTabChange = (tab) => {
