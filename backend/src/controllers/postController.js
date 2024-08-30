@@ -104,6 +104,74 @@ postController.post('/:groupId/posts', async (req, res) => {
     }
 });
 
+// 게시글 목록 조회
+postController.get('/:groupId/posts', async (req, res) => {
+    const { groupId } = req.params;
+    const { page = 1, pageSize = 10, sortBy = 'mostLiked', keyword = '', isPublic } = req.query;
+
+    // 페이지 및 정렬 설정
+    const offset = (page - 1) * pageSize;
+    let orderBy = 'likeCount DESC';
+    if (sortBy === 'latest') {
+      orderBy = 'createdAt DESC';
+  } else if (sortBy === 'mostCommented') {
+      orderBy = 'commentCount DESC';
+  }
+
+    // 검색어 필터링 설정
+    const keywordFilter = keyword ? `%${keyword}%` : '%';
+
+    // 공개 여부 필터링 설정
+    const publicFilter = isPublic !== undefined ? `AND isPublic = ${isPublic}` : '';
+
+    try {
+        // 총 게시글 수 조회
+        const totalCountSql = `
+            SELECT COUNT(*) as totalItemCount
+            FROM posts
+            WHERE groupId = ? AND (title LIKE ? OR content LIKE ?) ${publicFilter}
+        `;
+        const totalItemCount = await new Promise((resolve, reject) => {
+            db.get(totalCountSql, [groupId, keywordFilter, keywordFilter], (err, row) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(row.totalItemCount);
+            });
+        });
+
+        // 총 페이지 수 계산
+        const totalPages = Math.ceil(totalItemCount / pageSize);
+
+        // 게시글 목록 조회
+        const postsSql = `
+            SELECT id, nickname, title, imageUrl, tags, location, moment, isPublic, likeCount, commentCount, createdAt
+            FROM posts
+            WHERE groupId = ? AND (title LIKE ? OR content LIKE ?) ${publicFilter}
+            ORDER BY ${orderBy}
+            LIMIT ? OFFSET ?
+        `;
+        const posts = await new Promise((resolve, reject) => {
+            db.all(postsSql, [groupId, keywordFilter, keywordFilter, pageSize, offset], (err, rows) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(rows);
+            });
+        });
+
+        // 결과 응답
+        res.status(200).json({
+            currentPage: page,
+            totalPages: totalPages,
+            totalItemCount: totalItemCount,
+            data: posts,
+        });
+    } catch (err) {
+        console.error("게시글 목록 조회 오류:", err.message);
+        res.status(400).json({ message: "잘못된 요청입니다" });
+    }
+});
 
 // 게시글 수정
 postController.put('/posts/:postId', async (req, res) => {
@@ -192,29 +260,28 @@ postController.delete('/posts/:postId', async (req, res) => {
         return res.status(400).json({ message: "잘못된 요청입니다" });
     }
 
-    // 기존 게시글 비밀번호 확인
     const checkPasswordSql = `
-        SELECT postPassword FROM posts WHERE id = ?
+        SELECT postPassword, groupId FROM posts WHERE id = ?
     `;
 
     try {
-        // 기존 게시글 비밀번호 조회
-        const existingPassword = await new Promise((resolve, reject) => {
+        // 게시글 비밀번호 및 그룹 ID 조회
+        const existingPost = await new Promise((resolve, reject) => {
             db.get(checkPasswordSql, [postId], (err, row) => {
                 if (err) {
                     return reject(err);
                 }
-                resolve(row ? row.postPassword : null);
+                resolve(row);
             });
         });
 
         // 게시글이 존재하지 않는 경우
-        if (existingPassword === null) {
+        if (!existingPost) {
             return res.status(404).json({ message: "존재하지 않습니다" });
         }
 
         // 비밀번호가 일치하지 않는 경우
-        if (existingPassword !== postPassword) {
+        if (existingPost.postPassword !== postPassword) {
             return res.status(403).json({ message: "비밀번호가 틀렸습니다" });
         }
 
@@ -223,7 +290,7 @@ postController.delete('/posts/:postId', async (req, res) => {
             DELETE FROM posts WHERE id = ?
         `;
 
-        const result = await new Promise((resolve, reject) => {
+        const deleteResult = await new Promise((resolve, reject) => {
             db.run(deleteSql, [postId], function(err) {
                 if (err) {
                     return reject(err);
@@ -233,15 +300,73 @@ postController.delete('/posts/:postId', async (req, res) => {
         });
 
         // 삭제된 행이 없는 경우
-        if (result === 0) {
+        if (deleteResult === 0) {
             return res.status(404).json({ message: "존재하지 않습니다" });
         }
+
+        // 그룹의 게시글 수 감소
+        const updateGroupSql = `
+            UPDATE groups
+            SET postCount = postCount - 1
+            WHERE id = ?
+        `;
+
+        await new Promise((resolve, reject) => {
+            db.run(updateGroupSql, [existingPost.groupId], function(err) {
+                if (err) {
+                    return reject(err);
+                }
+                resolve();
+            });
+        });
 
         res.status(200).json({ message: "게시글 삭제 성공" });
     } catch (err) {
         console.error("게시글 삭제 오류:", err.message);
         res.status(500).json({ message: '게시글 삭제에 실패했습니다.' });
     }
+});
+
+// 게시글 상세 정보 조회
+postController.get('/posts/:postId', async (req, res) => {
+  const { postId } = req.params;
+
+  // 게시글 ID 유효성 검사
+  if (!postId || isNaN(parseInt(postId))) {
+      return res.status(400).json({ message: '잘못된 요청입니다' });
+  }
+
+  // 게시글 상세 정보 조회 쿼리
+  const sql = `
+      SELECT id, groupId, nickname, title, content, imageUrl, tags, location, moment, isPublic, likeCount, commentCount, createdAt
+      FROM posts
+      WHERE id = ?
+  `;
+
+  try {
+      // 게시글 상세 정보 조회
+      const post = await new Promise((resolve, reject) => {
+          db.get(sql, [postId], (err, row) => {
+              if (err) {
+                  return reject(err);
+              }
+              resolve(row);
+          });
+      });
+
+      // 게시글이 존재하지 않는 경우
+      if (!post) {
+          return res.status(404).json({ message: '게시글이 존재하지 않습니다' });
+      }
+
+      // tags를 배열로 변환
+      post.tags = post.tags ? post.tags.split(',') : [];
+
+      res.status(200).json(post);
+  } catch (err) {
+      console.error("게시글 상세 정보 조회 오류:", err.message);
+      res.status(500).json({ message: '게시글 조회에 실패했습니다.' });
+  }
 });
 
 module.exports = postController;
