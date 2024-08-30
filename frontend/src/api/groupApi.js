@@ -21,6 +21,7 @@ export const createGroup = async (groupData) => {
     throw error;
   }
 };
+
 // 그룹 목록 조회
 export const fetchGroups = async (
   page,
@@ -30,20 +31,25 @@ export const fetchGroups = async (
   isPublic
 ) => {
   try {
-    const queryParams = new URLSearchParams({
-      page,
-      pageSize,
-      sortBy,
-      keyword,
-      isPublic,
-    });
+    const queryParams = new URLSearchParams();
+
+    if (page !== undefined && page !== null) queryParams.append("page", page);
+    if (pageSize !== undefined && pageSize !== null)
+      queryParams.append("pageSize", pageSize);
+    if (sortBy) queryParams.append("sortBy", sortBy);
+    if (keyword) queryParams.append("keyword", keyword);
+    if (typeof isPublic === "boolean")
+      queryParams.append("isPublic", isPublic.toString());
 
     const response = await fetch(`/api/groups?${queryParams.toString()}`, {
       method: "GET",
     });
 
     if (!response.ok) {
-      throw new Error("그룹 목록 조회에 실패했습니다.");
+      // 서버에서 반환된 에러 메시지 처리
+      const errorData = await response.json();
+      console.error("Error from server:", errorData);
+      throw new Error(errorData.message || "그룹 목록 조회에 실패했습니다.");
     }
 
     return await response.json();

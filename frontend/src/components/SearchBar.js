@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ReactComponent as PublicActiveIcon } from "../assets/public_active.svg";
 import { ReactComponent as PublicInactiveIcon } from "../assets/public_inactive.svg";
 import { ReactComponent as PrivateActiveIcon } from "../assets/private_active.svg";
@@ -15,36 +15,58 @@ function SearchBar({
   activeTab,
   onTabChange,
 }) {
-  const sortOptions = ["최신순", "게시물순", "공감순", "배지순"];
+  const sortOptions = [
+    { label: "최신순", value: "latest" },
+    { label: "게시물순", value: "mostPosted" },
+    { label: "공감순", value: "mostLiked" },
+    { label: "배지순", value: "mostBadge" },
+  ];
 
-  const mapFilterToSortBy = (filter) => {
-    switch (filter) {
-      case "최신순":
-        return "latest";
-      case "게시물순":
-        return "mostPosted";
-      case "공감순":
-        return "mostLiked";
-      case "배지순":
-        return "mostBadge";
-      default:
-        return "latest";
+  const [currentFilter, setCurrentFilter] = useState(
+    selectedFilter || "mostLiked"
+  );
+
+  useEffect(() => {
+    // selectedFilter가 변경되면 currentFilter를 업데이트
+    if (selectedFilter && selectedFilter !== currentFilter) {
+      setCurrentFilter(selectedFilter);
     }
-  };
+  }, [selectedFilter, currentFilter]);
+
+  useEffect(() => {
+    // 필터와 탭 상태 초기화
+    if (!selectedFilter) {
+      onFilterChange("mostLiked");
+    }
+    if (activeTab === undefined) {
+      onTabChange(true);
+    }
+  }, [selectedFilter, activeTab, onFilterChange, onTabChange]);
+
+  const selectedOptionLabel =
+    sortOptions.find((option) => option.value === currentFilter)?.label ||
+    "공감순";
 
   return (
     <div className={styles.searchBar}>
-      {/* 왼쪽의 공개/비공개 탭 */}
       <div className={styles.tabs}>
-        <div className={styles.tabButton} onClick={() => onTabChange(true)}>
-          {activeTab === true ? (
+        <div
+          className={`${styles.tabButton} ${activeTab ? styles.activeTab : ""}`}
+          onClick={() => onTabChange(true)}
+        >
+          {activeTab ? (
             <PublicActiveIcon className={styles.tabIcon} />
           ) : (
             <PublicInactiveIcon className={styles.tabIcon} />
           )}
         </div>
-        <div className={styles.tabButton} onClick={() => onTabChange(false)}>
-          {activeTab === false ? (
+        <div
+          className={`${styles.tabButton} ${
+            !activeTab ? styles.activeTab : ""
+          }`}
+          onClick={() => onTabChange(false)}
+        >
+          {!activeTab ? (
             <PrivateActiveIcon className={styles.tabIcon} />
           ) : (
             <PrivateInactiveIcon className={styles.tabIcon} />
@@ -52,7 +74,6 @@ function SearchBar({
         </div>
       </div>
 
-      {/* 검색 입력 필드 */}
       <div className={styles.searchInputWrapper}>
         <SearchIcon className={styles.searchIcon} />
         <input
@@ -64,11 +85,18 @@ function SearchBar({
         />
       </div>
 
-      {/* 오른쪽의 드롭다운 */}
       <Dropdown
-        options={sortOptions}
-        selectedOption={selectedFilter}
-        onOptionSelect={(option) => onFilterChange(mapFilterToSortBy(option))}
+        options={sortOptions.map((option) => option.label)}
+        selectedOption={selectedOptionLabel}
+        onOptionSelect={(selectedLabel) => {
+          const selectedValue =
+            sortOptions.find((option) => option.label === selectedLabel)
+              ?.value || "mostLiked";
+          if (selectedValue !== currentFilter) {
+            setCurrentFilter(selectedValue);
+            onFilterChange(selectedValue); // 필터 변경 알림
+          }
+        }}
       />
     </div>
   );

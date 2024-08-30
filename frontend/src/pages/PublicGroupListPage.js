@@ -1,42 +1,104 @@
-import React, { useEffect, useState } from "react";
+import React, { useReducer, useEffect } from "react";
 import GroupCard from "../components/GroupCard";
 import styles from "./PublicGroupListPage.module.css";
-import SearchBar from "../components/SearchBar";
-import { fetchGroups } from "../api/groupApi"; // 실제 API 호출 함수
+import mockGroups from "../api/mockGroups";
 
-function PublicGroupListPage() {
-  const [groups, setGroups] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState("latest"); // 기본 정렬 기준
-  const [searchTerm, setSearchTerm] = useState(""); // 검색어
-  const [isPublic, setIsPublic] = useState(true); // 공개/비공개 여부
+const initialState = {
+  groups: [],
+  loading: true,
+  error: false,
+  displayedGroups: [], // 페이지에 표시할 그룹들
+  itemsToShow: 10, // 처음에 보여줄 항목 수
+  allItemsLoaded: false, // 모든 항목이 로드되었는지 여부를 나타내는 플래그
+};
 
-  const loadGroups = async () => {
-    setLoading(true);
-    try {
-      const response = await fetchGroups(
-        currentPage,
-        10,
-        sortBy,
-        searchTerm,
-        isPublic
+function reducer(state, action) {
+  switch (action.type) {
+    case "FETCH_INIT":
+      return {
+        ...state,
+        loading: true,
+        error: false,
+      };
+    case "FETCH_SUCCESS":
+      return {
+        ...state,
+        loading: false,
+        groups: action.payload,
+        displayedGroups: action.payload.slice(0, state.itemsToShow),
+        allItemsLoaded: action.payload.length <= state.itemsToShow,
+      };
+    case "LOAD_MORE":
+      const moreItems = state.groups.slice(
+        0,
+        state.displayedGroups.length + action.payload
       );
-      setGroups(response.data); // 서버로부터 받은 그룹 데이터 설정
-      setLoading(false);
-    } catch (err) {
-      setError(true);
-      setLoading(false);
-    }
-  };
+      return {
+        ...state,
+        displayedGroups: moreItems,
+        allItemsLoaded: moreItems.length >= state.groups.length,
+      };
+    case "FETCH_FAILURE":
+      return {
+        ...state,
+        loading: false,
+        error: true,
+      };
+    default:
+      return state;
+  }
+}
+
+function PublicGroupListPage({
+  searchTerm = "",
+  selectedFilter = "mostLiked",
+}) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { groups, loading, error, displayedGroups, allItemsLoaded } = state;
 
   useEffect(() => {
-    loadGroups();
-  }, [currentPage, sortBy, searchTerm, isPublic]);
+    const fetchGroups = async () => {
+      dispatch({ type: "FETCH_INIT" });
+
+      try {
+        let fetchedGroups = [...mockGroups];
+
+        if (searchTerm) {
+          fetchedGroups = fetchedGroups.filter((group) =>
+            group.name.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+
+        const sortBy = {
+          mostLiked: (a, b) => b.likeCount - a.likeCount,
+          latest: (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+          mostPosted: (a, b) => b.postCount - a.postCount,
+          mostBadge: (a, b) => b.badgeCount - a.badgeCount,
+        };
+
+        const sortFunction = sortBy[selectedFilter] || sortBy.mostLiked;
+        fetchedGroups.sort(sortFunction);
+
+        dispatch({ type: "FETCH_SUCCESS", payload: fetchedGroups });
+      } catch (err) {
+        console.error("그룹을 가져오는 중 오류 발생:", err);
+        dispatch({ type: "FETCH_FAILURE" });
+      }
+    };
+
+    fetchGroups();
+  }, [selectedFilter, searchTerm]);
+
+  const loadMoreItems = () => {
+    dispatch({ type: "LOAD_MORE", payload: 8 });
+  };
 
   if (loading) {
-    return <p>로딩 중...</p>;
+    return (
+      <div className={styles.loadingContainer}>
+        <p>로딩 중...</p>
+      </div>
+    );
   }
 
   if (error) {
@@ -47,7 +109,7 @@ function PublicGroupListPage() {
     );
   }
 
-  if (groups.length === 0) {
+  if (!groups.length) {
     return (
       <div className={styles.emptyState}>
         <img src="emptyGroup.svg" alt="Empty group" />
@@ -57,32 +119,17 @@ function PublicGroupListPage() {
   }
 
   return (
-    <div className={styles.groupList}>
-      <SearchBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        selectedFilter={sortBy}
-        onFilterChange={setSortBy}
-        activeTab={isPublic}
-        onTabChange={setIsPublic}
-      />
-      {groups.map((group) => (
-        <GroupCard key={group.id} group={group} />
-      ))}
-      <div className={styles.pagination}>
-        <button
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage(currentPage - 1)}
-        >
-          이전
-        </button>
-        <button
-          disabled={groups.length < 10} // 만약 데이터가 페이지당 아이템 수보다 적다면 다음 버튼 비활성화
-          onClick={() => setCurrentPage(currentPage + 1)}
-        >
-          다음
-        </button>
+    <div className={styles.pageContainer}>
+      <div className={styles.groupList}>
+        {displayedGroups.map((group) => (
+          <GroupCard key={group.id} group={group} />
+        ))}
       </div>
+      {!allItemsLoaded && (
+        <button className={styles.loadMoreButton} onClick={loadMoreItems}>
+          더보기
+        </button>
+      )}
     </div>
   );
 }

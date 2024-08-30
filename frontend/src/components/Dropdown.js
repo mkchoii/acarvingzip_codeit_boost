@@ -10,7 +10,7 @@ function Dropdown({ options, selectedOption, onOptionSelect }) {
 
   const handleOptionClick = (option) => {
     onOptionSelect(option);
-    setIsOpen(false); // 선택 후 드롭다운 닫기
+    setIsOpen(false);
   };
 
   return (
