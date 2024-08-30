@@ -3,7 +3,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const groupController = require('./controllers/groupController'); 
 const postController = require('./controllers/postController'); 
-const imageController = require('./controllers/imageController'); 
+const imageController = require('./controllers/imageController');
+const commentController = require('./controllers/commentController'); 
 
 const app = express();
 const port = 3000;
@@ -17,6 +18,8 @@ app.use('/api/groups', groupController);
 app.use('/api/image', imageController);
 app.use('/api/groups', postController);
 app.use('/api/posts', postController); 
+app.use('/api/posts', commentController);
+app.use('/api/comments', commentController);
 
 app.get('/', (req, res) => {
     res.send('그룹 관리 서버가 실행 중입니다.');
