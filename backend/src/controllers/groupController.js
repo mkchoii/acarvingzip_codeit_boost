@@ -382,4 +382,48 @@ groupController.get('/:id', async (req, res) => {
     }
 });
 
+// 그룹 공개 여부 확인
+groupController.get('/:groupId/is-public', async (req, res) => {
+    const { groupId } = req.params;
+
+    // 그룹 ID 유효성 검사
+    if (!groupId || isNaN(parseInt(groupId))) {
+        return res.status(400).json({ message: '잘못된 요청입니다' });
+    }
+
+    // 그룹 공개 여부를 확인하는 쿼리
+    const sql = `
+        SELECT id, isPublic
+        FROM groups
+        WHERE id = ?
+    `;
+
+    try {
+        // 그룹 공개 여부 조회
+        const group = await new Promise((resolve, reject) => {
+            db.get(sql, [groupId], (err, row) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(row);
+            });
+        });
+
+        // 그룹이 존재하지 않는 경우
+        if (!group) {
+            return res.status(404).json({ message: '존재하지 않는 그룹입니다' });
+        }
+
+        // 공개 여부와 그룹 ID 반환
+        res.status(200).json({
+            id: group.id,
+            isPublic: group.isPublic
+        });
+    } catch (err) {
+        console.error("그룹 공개 여부 확인 오류:", err.message);
+        res.status(500).json({ message: '그룹 공개 여부 확인에 실패했습니다.' });
+    }
+});
+
+
 module.exports = groupController;
