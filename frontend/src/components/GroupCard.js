@@ -1,10 +1,10 @@
 import React from "react";
-import { useNavigate } from "react-router-dom"; // useNavigate 훅을 가져옵니다.
+import { useNavigate } from "react-router-dom";
 import styles from "./GroupCard.module.css";
 import { ReactComponent as Favicon } from "../assets/favicon_s.svg";
 
 function GroupCard({ group }) {
-  const navigate = useNavigate(); // 페이지 이동을 위해 useNavigate 훅을 사용합니다.
+  const navigate = useNavigate(); // 페이지 이동
   const isImageAvailable = Boolean(group.image);
   const isPublic = group.isPublic;
 
@@ -28,18 +28,18 @@ function GroupCard({ group }) {
 
   const handleClick = () => {
     if (!isPublic) {
-      // 그룹이 비공개일 때만 접근 권한 페이지로 이동합니다.
+      // 그룹이 비공개일 때는 접근 권한 확인 페이지
       navigate(`/private-group-access/${group.id}`);
     } else {
-      // 공개 그룹일 경우, 다른 페이지로 이동하거나 해당 동작을 추가할 수 있습니다.
-      console.log("공개 그룹 클릭");
+      // 공개 그룹일 경우, 그룹 상세 페이지
+      navigate(`/group/${group.id}`);
     }
   };
 
   return (
     <div
       className={`${styles.card} ${cardClassName}`}
-      onClick={handleClick} // 클릭 핸들러를 추가하여 비공개 그룹일 때 접근 권한 페이지로 이동하도록 합니다.
+      onClick={handleClick} // 페이지 이동
     >
       {isImageAvailable && isPublic && (
         <img src={group.image} alt={group.name} className={styles.image} />

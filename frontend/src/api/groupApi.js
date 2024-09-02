@@ -46,7 +46,6 @@ export const fetchGroups = async (
     });
 
     if (!response.ok) {
-      // 서버에서 반환된 에러 메시지 처리
       const errorData = await response.json();
       console.error("Error from server:", errorData);
       throw new Error(errorData.message || "그룹 목록 조회에 실패했습니다.");
@@ -81,6 +80,92 @@ export const checkPrivateGroupAccess = async (groupId, password) => {
     return await response.json();
   } catch (error) {
     console.error("Error:", error);
+    throw error;
+  }
+};
+
+// 그룹 상세 정보 조회
+export const fetchGroupDetail = async (groupId) => {
+  try {
+    const response = await fetch(`/api/groups/${groupId}`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "잘못된 요청입니다");
+      }
+      throw new Error("그룹 상세 정보를 가져오는 데 실패했습니다.");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching group detail:", error);
+    throw error;
+  }
+};
+
+// 그룹 수정
+export const updateGroup = async (groupId, groupData) => {
+  try {
+    const response = await fetch(`/api/groups/${groupId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(groupData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+
+      if (response.status === 400) {
+        throw new Error(errorData.message || "잘못된 요청입니다.");
+      } else if (response.status === 403) {
+        throw new Error("비밀번호가 틀렸습니다.");
+      } else if (response.status === 404) {
+        throw new Error("존재하지 않는 그룹입니다.");
+      } else {
+        throw new Error("그룹 정보를 수정하는 데 실패했습니다.");
+      }
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating group:", error);
+    throw error;
+  }
+};
+
+// 그룹 삭제
+export const deleteGroup = async (groupId, password) => {
+  try {
+    const response = await fetch(`/api/groups/${groupId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ password }), // 비밀번호
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+
+      if (response.status === 400) {
+        throw new Error(errorData.message || "잘못된 요청입니다.");
+      } else if (response.status === 403) {
+        throw new Error("비밀번호가 틀렸습니다.");
+      } else if (response.status === 404) {
+        throw new Error("존재하지 않는 그룹입니다.");
+      } else {
+        throw new Error("그룹을 삭제하는 데 실패했습니다.");
+      }
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting group:", error);
     throw error;
   }
 };

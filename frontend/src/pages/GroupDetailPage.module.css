@@ -1,0 +1,244 @@
+.groupDetailPage {
+  margin: 0 auto;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.logo {
+  display: block;
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
+.description {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+  padding-left: 20px; /* 이미지 오른쪽에 여백을 추가 */
+  padding-right: 20px;
+}
+
+.groupImageWrapper {
+  flex-shrink: 0;
+}
+
+.groupImage {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.groupInfo {
+  flex: 1;
+  margin-left: 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.groupMetaAndActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+}
+
+.groupMeta {
+  display: flex;
+  gap: 10px;
+  font-size: 16px;
+  color: #8d8d8d;
+  gap: 20px;
+}
+
+.groupDate {
+  color: #282828;
+}
+
+.managementButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.textButton {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #282828;
+  cursor: pointer;
+}
+
+.textButton:hover {
+  text-decoration: underline;
+}
+
+.titleAndStats {
+  display: flex;
+  align-items: center;
+  gap: 50px; /* 타이틀과 게시글/공감 수 사이의 간격 */
+}
+
+.groupTitle {
+  font-size: 28px;
+  margin: 0;
+}
+
+.groupStatistics {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* 게시글과 그룹 공감 사이의 여백 */
+}
+
+.statsLabel {
+  margin-right: -5px; /* 텍스트와 숫자 사이의 여백 */
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.statsValue {
+  font-weight: 700;
+  margin-right: 30px; /* 게시글 숫자와 그룹 공감 사이의 간격을 더 크게 조절 */
+}
+
+.groupMetaAndActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px; /* 간격 조절 */
+}
+
+.groupDescription {
+  font-size: 16px;
+  margin-bottom: 50px;
+}
+
+.separator {
+  width: 100%;
+  max-width: 1200px;
+  border-bottom: 1px solid #dddddd;
+  margin: 20px 0;
+}
+
+.badgeAndLikeContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.badgesSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.badgesTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #282828;
+  margin-bottom: 5px;
+}
+
+.badges {
+  display: flex;
+  gap: 5px;
+}
+
+.badge {
+  transform: scale(0.75);
+  margin: 0 -20px;
+}
+
+.likeButton {
+  cursor: pointer;
+  width: 150px;
+  height: auto;
+  margin-top: 30px;
+}
+
+/* 추억올리기 */
+.memorySection {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.memoryHeader {
+  display: flex;
+  justify-content: center; /* 가운데 정렬 */
+  align-items: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  position: relative; /* 추억 올리기 버튼을 절대 위치로 배치하기 위해 필요 */
+}
+
+.memoryTitle {
+  font-size: 24px;
+  font-weight: bold;
+  position: absolute; /* 가운데 정렬을 위한 절대 위치 */
+  left: 50%;
+  transform: translateX(-50%); /* 중앙으로 이동 */
+}
+
+.uploadButton {
+  background-color: #282828;
+  color: #fafafa;
+  border: none;
+  width: 150px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  position: absolute; /* 절대 위치 */
+  right: 0; /* 오른쪽 끝에 고정 */
+}
+
+.uploadButton {
+  background-color: #282828;
+  color: #fafafa;
+  border: none;
+  width: 150px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.searchBarWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 0;
+  box-sizing: border-box;
+  margin-top: 40px;
+}
+
+.searchBarWrapper > * {
+  flex-grow: 1;
+}
+
+.searchBarWrapper > *:first-child {
+  flex-grow: 2; /* SearchBar가 더 많은 공간을 차지하도록 설정 */
+  padding: 0;
+}
+
+.searchBarWrapper > *:last-child {
+  flex-grow: 1; /* 드롭다운 필터 버튼이 차지할 공간 비율을 상대적으로 줄임 */
+}
+
+.searchBarWrapper input {
+  width: 100%; /* input이 컨테이너의 전체 너비를 차지하도록 설정 */
+}

@@ -14,6 +14,7 @@ function SearchBar({
   onFilterChange,
   activeTab,
   onTabChange,
+  placeholder = "그룹명을 검색해 주세요", // 기본값 설정
 }) {
   // sortOptions 배열을 useMemo로 메모이제이션
   const sortOptions = useMemo(
@@ -86,7 +87,7 @@ function SearchBar({
         <SearchIcon className={styles.searchIcon} />
         <input
           type="text"
-          placeholder="그룹명을 검색해 주세요"
+          placeholder={placeholder} // 여기서 props로 받은 placeholder를 사용
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           className={styles.searchInput}
