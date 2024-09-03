@@ -169,3 +169,25 @@ export const deleteGroup = async (groupId, password) => {
     throw error;
   }
 };
+
+// 그룹 공감하기 버튼
+export const likeGroup = async (groupId) => {
+  try {
+    const response = await fetch(`/api/groups/${groupId}/like`, {
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("존재하지 않는 그룹입니다.");
+      } else {
+        throw new Error("그룹 공감하기에 실패했습니다.");
+      }
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error liking group:", error);
+    throw error;
+  }
+};

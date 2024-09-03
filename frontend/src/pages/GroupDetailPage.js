@@ -10,6 +10,9 @@ import PostLikeBadge from "../assets/badge_postLike.png";
 import PrivateGroupDetail from "../pages/PrivateGroupDetail"; // PrivateGroupDetail 임포트
 import PublicGroupDetail from "../pages/PublicGroupDetail"; // PublicGroupDetail 임포트
 import styles from "./GroupDetailPage.module.css";
+// import { updateGroup } from "../api/groupApi"; // 수정
+// import { deleteGroup } from "../api/groupApi"; // 삭제
+import { likeGroup } from "../api/groupApi"; // 공감 버튼
 
 function GroupDetailPage() {
   const { groupId } = useParams();
@@ -66,7 +69,20 @@ function GroupDetailPage() {
   };
 
   const handleUploadClick = () => {
-    alert("추억 올리기 기능은 아직 구현되지 않았습니다.");
+    navigate(`/group/${groupId}/upload-memory`);
+  };
+
+  const handleLikeClick = async () => {
+    try {
+      await likeGroup(groupId);
+      setGroupDetail((prevDetail) => ({
+        ...prevDetail,
+        likeCount: prevDetail.likeCount + 1,
+      }));
+    } catch (error) {
+      console.error("Error liking group:", error);
+      alert("공감하기에 실패했습니다.");
+    }
   };
 
   if (loading) return <div className={styles.loading}>로딩 중...</div>;
@@ -131,7 +147,10 @@ function GroupDetailPage() {
                 />
               </div>
             </div>
-            <LikeButtonIcon className={styles.likeButton} />
+            <LikeButtonIcon
+              className={styles.likeButton}
+              onClick={handleLikeClick}
+            />
           </div>
         </div>
       </div>
