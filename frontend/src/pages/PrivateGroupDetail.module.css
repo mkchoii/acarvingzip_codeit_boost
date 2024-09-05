@@ -1,10 +1,10 @@
-/*Private*/
 .groupDetail {
   width: 100%;
   max-width: 1200px;
   margin-top: 20px;
   margin-left: auto;
   margin-right: auto;
+  padding-bottom: 200px;
 }
 
 .posts {
@@ -68,4 +68,29 @@
 
 .uploadButton:hover {
   background-color: #3d3d3d;
+}
+
+/* 더보기 버튼 */
+.loadMoreButton {
+  box-sizing: border-box;
+  margin: 60px auto 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  width: 100%;
+  max-width: 1500px;
+  height: 40px;
+  background: #fafafa;
+  border: 1px solid #282828;
+  border-radius: 6px;
+  color: #282828;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* 호버 시 배경색 전환 효과 */
+}
+
+.loadMoreButton:hover {
+  background-color: #f4f4f4;
 }
