@@ -1,0 +1,100 @@
+.card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fafafa;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.image {
+  width: 90%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.content {
+  padding: 16px;
+  flex-grow: 1;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #b8b8b8;
+  margin-bottom: 8px;
+}
+
+.author {
+  font-size: 14px;
+  color: #282828;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #282828;
+  margin-bottom: 12px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.tag {
+  margin-right: 8px;
+  font-size: 12px;
+  color: #b8b8b8;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #b8b8b8;
+  align-items: center;
+}
+
+.location {
+  font-size: 12px;
+  color: #282828;
+}
+
+.interactions {
+  display: flex;
+  align-items: center;
+}
+
+.likes,
+.comments {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 400;
+  color: #b8b8b8;
+}
+
+.likes {
+  margin-right: 12px;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.marginLeft {
+  margin-left: 12px;
+}

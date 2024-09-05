@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import mockGroups from "../api/mockGroups";
+import mockMemories from "../api/mockMemory"; // mockMemory 사용
 import { ReactComponent as Logo } from "../assets/logo.svg";
 import { ReactComponent as LikeButtonIcon } from "../assets/likeButton.svg";
 import GroupLikeBadge from "../assets/badge_groupLike.png";
@@ -19,8 +20,10 @@ function GroupDetailPage() {
   const [groupDetail, setGroupDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // 검색어
   const [selectedFilter, setSelectedFilter] = useState("mostLiked");
+  const [activeTab, setActiveTab] = useState("public"); // 기본값을 공개로 설정
+  const [filteredMemories, setFilteredMemories] = useState([]); // 필터링된 메모리 목록
 
   const navigate = useNavigate();
 
@@ -60,8 +63,33 @@ function GroupDetailPage() {
     loadGroupDetail();
   }, [groupId]);
 
+  useEffect(() => {
+    if (groupDetail) {
+      const filtered = mockMemories
+        .filter(
+          (memory) =>
+            memory.groupId === parseInt(groupId) &&
+            memory.isPublic === (activeTab === "public")
+        )
+        .filter((memory) => {
+          if (!searchTerm.trim()) return true;
+          const lowerCasedTerm = searchTerm.toLowerCase();
+          const matchesTitle = memory.title
+            .toLowerCase()
+            .includes(lowerCasedTerm);
+          const matchesTags = memory.tags.some((tag) =>
+            tag.toLowerCase().includes(lowerCasedTerm)
+          );
+          return matchesTitle || matchesTags;
+        });
+
+      console.log("Filtered Memories:", filtered); // 필터링된 결과를 출력
+      setFilteredMemories(filtered);
+    }
+  }, [activeTab, groupDetail, groupId, searchTerm]);
+
   const handleSearchChange = (term) => {
-    setSearchTerm(term);
+    setSearchTerm(term); // 검색어 업데이트
   };
 
   const handleFilterChange = (filter) => {
@@ -83,6 +111,10 @@ function GroupDetailPage() {
       console.error("Error liking group:", error);
       alert("공감하기에 실패했습니다.");
     }
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
   };
 
   if (loading) return <div className={styles.loading}>로딩 중...</div>;
@@ -168,14 +200,16 @@ function GroupDetailPage() {
             onSearchChange={handleSearchChange}
             selectedFilter={selectedFilter}
             onFilterChange={handleFilterChange}
-            activeTab={groupDetail.isPublic ? "public" : "private"}
+            activeTab={activeTab}
+            onTabChange={handleTabChange} // 탭 변경 핸들러 전달
             placeholder="태그 혹은 제목을 입력해주세요."
           />
         </div>
-        {groupDetail.isPublic ? (
-          <PublicGroupDetail group={groupDetail} />
+        {/* 필터링된 메모리를 Public/PrivateGroupDetail로 전달 */}
+        {activeTab === "public" ? (
+          <PublicGroupDetail group={groupDetail} memories={filteredMemories} />
         ) : (
-          <PrivateGroupDetail group={groupDetail} />
+          <PrivateGroupDetail group={groupDetail} memories={filteredMemories} />
         )}
       </div>
     </div>
