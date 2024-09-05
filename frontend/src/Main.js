@@ -4,6 +4,7 @@ import CreateGroupPage from "./pages/CreateGroupPage";
 import PrivateGroupAccessPage from "./pages/PrivateGroupAccessPage";
 import GroupDetailPage from "./pages/GroupDetailPage";
 import MemoryUploadPage from "./pages/MemoryUploadPage";
+import PrivatePostAccessPage from "./pages/PrivatePostAccessPage";
 import NotFoundPage from "./pages/404Page";
 
 function Main() {
@@ -21,6 +22,12 @@ function Main() {
           path="/group/:groupId/upload-memory"
           element={<MemoryUploadPage />}
         />
+
+        <Route
+          path="/post/:postId/access"
+          element={<PrivatePostAccessPage />} // 비공식 게시글 접근 권한 페이지 라우트
+        />
+
         {/* 404 페이지 라우팅 */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

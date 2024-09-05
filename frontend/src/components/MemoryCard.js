@@ -2,8 +2,11 @@ import React from "react";
 import styles from "./MemoryCard.module.css";
 import { ReactComponent as LikeIcon } from "../assets/favicon_s.svg"; // 좋아요 아이콘
 import { ReactComponent as CommentIcon } from "../assets/icon_bubble.svg"; // 댓글 아이콘
+import { useNavigate } from "react-router-dom"; // useNavigate 훅 임포트
 
 function MemoryCard({ post, isPublic }) {
+  const navigate = useNavigate(); // 네비게이션을 위한 훅
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     if (isNaN(date)) {
@@ -20,12 +23,23 @@ function MemoryCard({ post, isPublic }) {
 
   const formattedDate = formatDate(post.date); // 날짜 포맷팅
 
+  const handleCardClick = () => {
+    if (isPublic) {
+      // 공개된 메모리로 바로 이동
+      navigate(`/post/${post.id}`);
+    } else {
+      // 비공개 메모리로 비밀번호 확인 페이지로 이동
+      navigate(`/post/${post.id}/access`);
+    }
+  };
+
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={handleCardClick}>
+      {" "}
+      {/* 카드 클릭 시 동작 추가 */}
       {isPublic && post.imageUrl && (
         <img src={post.imageUrl} alt={post.title} className={styles.image} />
       )}
-
       <div className={styles.content}>
         <div className={styles.header}>
           <span className={styles.author}>{post.author}</span>
