@@ -1,0 +1,83 @@
+.container {
+  margin: 0 auto;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto;
+  cursor: pointer;
+  margin-bottom: 150px; /* 간격을 조정하여 콘텐츠를 더 가깝게 배치 */
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.description {
+  font-size: 14px;
+  margin-bottom: 60px; /* 간격을 더 자연스럽게 조정 */
+  text-align: center;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+  text-align: left;
+  width: 100%;
+  max-width: 400px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input {
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 60px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.error {
+  color: #ff5757;
+  margin-bottom: 20px;
+}
+
+.submitButton {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px;
+  font-size: 16px;
+  color: #fafafa;
+  background-color: #282828;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 20px;
+  box-sizing: border-box;
+}
+
+.submitButton:hover {
+  background-color: #8d8d8d;
+}

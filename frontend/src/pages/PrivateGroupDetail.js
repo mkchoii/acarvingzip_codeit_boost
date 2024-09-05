@@ -1,13 +1,19 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import MemoryCard from "../components/MemoryCard";
 import styles from "./PrivateGroupDetail.module.css";
 import noPostsImage from "../assets/emptyMemory.svg";
 
 function PrivateGroupDetail({ group, memories }) {
-  const [visibleMemories, setVisibleMemories] = useState(8); // 초기 상태로 8개의 메모리를 표시
+  const [visibleMemories, setVisibleMemories] = useState(8);
+  const navigate = useNavigate();
 
   const handleLoadMore = () => {
-    setVisibleMemories((prev) => prev + 8); // 더보기 버튼 클릭 시 8개씩 추가로 표시
+    setVisibleMemories((prev) => prev + 8);
+  };
+
+  const handleMemoryClick = (postId) => {
+    navigate(`/post/${postId}/access`); // 비공식 메모리 접근 권한 페이지로 이동
   };
 
   return (
@@ -17,7 +23,12 @@ function PrivateGroupDetail({ group, memories }) {
           <>
             <div className={styles.postList}>
               {memories.slice(0, visibleMemories).map((post) => (
-                <MemoryCard key={post.id} post={post} isPublic={false} />
+                <MemoryCard
+                  key={post.id}
+                  post={post}
+                  isPublic={false}
+                  onClick={handleMemoryClick} // 클릭 핸들러 추가
+                />
               ))}
             </div>
             {visibleMemories < memories.length && (
