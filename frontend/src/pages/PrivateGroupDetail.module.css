@@ -1,7 +1,10 @@
+/*Private*/
 .groupDetail {
   width: 100%;
   max-width: 1200px;
   margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .posts {
@@ -9,13 +12,12 @@
 }
 
 .postList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4개의 열로 구성 */
+  gap: 20px; /* 카드 간의 간격 */
 }
 
 .postCard {
-  width: calc(33.333% - 20px);
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   padding: 10px;
@@ -58,8 +60,12 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  width: 400px;
+  width: 200px;
   font-size: 18px;
   transition: background-color 0.3s ease;
   margin-top: 50px;
+}
+
+.uploadButton:hover {
+  background-color: #3d3d3d;
 }
