@@ -2,29 +2,30 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import mockGroups from "../api/mockGroups";
-import mockMemories from "../api/mockMemory"; // mockMemory 사용
+import mockMemories from "../api/mockMemory";
 import { ReactComponent as Logo } from "../assets/logo.svg";
 import { ReactComponent as LikeButtonIcon } from "../assets/likeButton.svg";
 import GroupLikeBadge from "../assets/badge_groupLike.png";
 import PostBadge from "../assets/badge_post.png";
 import PostLikeBadge from "../assets/badge_postLike.png";
-import PrivateGroupDetail from "../pages/PrivateGroupDetail"; // PrivateGroupDetail 임포트
-import PublicGroupDetail from "../pages/PublicGroupDetail"; // PublicGroupDetail 임포트
+import PrivateGroupDetail from "../pages/PrivateGroupDetail";
+import PublicGroupDetail from "../pages/PublicGroupDetail";
+import GroupDeleteModal from "../components/GroupDeleteModal"; // 삭제 모달 임포트
+import GroupUpdateModal from "../components/GroupUpdateModal"; // 수정 모달 임포트
 import styles from "./GroupDetailPage.module.css";
-// import { updateGroup } from "../api/groupApi"; // 수정
-// import { deleteGroup } from "../api/groupApi"; // 삭제
-import { likeGroup } from "../api/groupApi"; // 공감 버튼
+import { likeGroup, updateGroup, deleteGroup } from "../api/groupApi"; // API 호출
 
 function GroupDetailPage() {
   const { groupId } = useParams();
   const [groupDetail, setGroupDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(""); // 검색어
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("mostLiked");
-  const [activeTab, setActiveTab] = useState("public"); // 기본값을 공개로 설정
-  const [filteredMemories, setFilteredMemories] = useState([]); // 필터링된 메모리 목록
-
+  const [activeTab, setActiveTab] = useState("public");
+  const [filteredMemories, setFilteredMemories] = useState([]);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false); // 수정 모달 상태
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달 상태
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
@@ -51,7 +52,6 @@ function GroupDetailPage() {
         }
 
         group.days = calculateDday(group.createdAt);
-
         setGroupDetail(group);
         setLoading(false);
       } catch (err) {
@@ -83,13 +83,12 @@ function GroupDetailPage() {
           return matchesTitle || matchesTags;
         });
 
-      console.log("Filtered Memories:", filtered); // 필터링된 결과를 출력
       setFilteredMemories(filtered);
     }
   }, [activeTab, groupDetail, groupId, searchTerm]);
 
   const handleSearchChange = (term) => {
-    setSearchTerm(term); // 검색어 업데이트
+    setSearchTerm(term);
   };
 
   const handleFilterChange = (filter) => {
@@ -108,13 +107,36 @@ function GroupDetailPage() {
         likeCount: prevDetail.likeCount + 1,
       }));
     } catch (error) {
-      console.error("Error liking group:", error);
       alert("공감하기에 실패했습니다.");
     }
   };
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+  };
+
+  // 그룹 수정 처리 함수
+  const handleGroupUpdate = async (updatedData) => {
+    try {
+      await updateGroup(groupId, updatedData); // API 호출
+      alert("그룹 정보가 성공적으로 수정되었습니다.");
+      setGroupDetail((prevDetail) => ({ ...prevDetail, ...updatedData })); // 그룹 정보 업데이트
+      setIsUpdateModalOpen(false); // 모달 닫기
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  // 그룹 삭제 처리 함수
+  const handleGroupDelete = async (password) => {
+    try {
+      await deleteGroup(groupId, password); // API 호출
+      alert("그룹이 성공적으로 삭제되었습니다.");
+      setIsDeleteModalOpen(false); // 모달 닫기
+      navigate("/"); // 그룹 삭제 후 메인 페이지로 이동
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   if (loading) return <div className={styles.loading}>로딩 중...</div>;
@@ -144,8 +166,18 @@ function GroupDetailPage() {
               </span>
             </div>
             <div className={styles.managementButtons}>
-              <button className={styles.textButton}>그룹 정보 수정하기</button>
-              <button className={styles.textButton}>그룹 삭제하기</button>
+              <button
+                className={styles.textButton}
+                onClick={() => setIsUpdateModalOpen(true)}
+              >
+                그룹 정보 수정하기
+              </button>
+              <button
+                className={styles.textButton}
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
+                그룹 삭제하기
+              </button>
             </div>
           </div>
           <div className={styles.titleAndStats}>
@@ -201,17 +233,32 @@ function GroupDetailPage() {
             selectedFilter={selectedFilter}
             onFilterChange={handleFilterChange}
             activeTab={activeTab}
-            onTabChange={handleTabChange} // 탭 변경 핸들러 전달
+            onTabChange={handleTabChange}
             placeholder="태그 혹은 제목을 입력해주세요."
           />
         </div>
-        {/* 필터링된 메모리를 Public/PrivateGroupDetail로 전달 */}
         {activeTab === "public" ? (
           <PublicGroupDetail group={groupDetail} memories={filteredMemories} />
         ) : (
           <PrivateGroupDetail group={groupDetail} memories={filteredMemories} />
         )}
       </div>
+
+      {/* 수정 및 삭제 모달 */}
+      {isUpdateModalOpen && (
+        <GroupUpdateModal
+          group={groupDetail}
+          onClose={() => setIsUpdateModalOpen(false)}
+          onSave={handleGroupUpdate}
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <GroupDeleteModal
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleGroupDelete}
+        />
+      )}
     </div>
   );
 }
