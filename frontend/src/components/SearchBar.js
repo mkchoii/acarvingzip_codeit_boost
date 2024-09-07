@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ReactComponent as PublicActiveIcon } from "../assets/public_active.svg";
 import { ReactComponent as PublicInactiveIcon } from "../assets/public_inactive.svg";
 import { ReactComponent as PrivateActiveIcon } from "../assets/private_active.svg";
@@ -15,18 +15,13 @@ function SearchBar({
   activeTab,
   onTabChange,
   placeholder = "그룹명을 검색해 주세요", // 기본값 설정
+  sortOptions = [
+    { label: "최신순", value: "latest" }, // 기본 옵션
+    { label: "게시물순", value: "mostPosted" }, // 기본 옵션
+    { label: "공감순", value: "mostLiked" }, // 기본 옵션
+    { label: "배지순", value: "mostBadge" }, // 기본 옵션
+  ], // sortOptions를 props로 받음
 }) {
-  // sortOptions 배열을 useMemo로 메모이제이션
-  const sortOptions = useMemo(
-    () => [
-      { label: "최신순", value: "latest" },
-      { label: "게시물순", value: "mostPosted" },
-      { label: "공감순", value: "mostLiked" },
-      { label: "배지순", value: "mostBadge" },
-    ],
-    []
-  );
-
   const [currentFilter, setCurrentFilter] = useState("mostLiked");
 
   // 필터가 변경될 때 currentFilter를 업데이트
@@ -87,7 +82,7 @@ function SearchBar({
         <SearchIcon className={styles.searchIcon} />
         <input
           type="text"
-          placeholder={placeholder} // 여기서 props로 받은 placeholder를 사용
+          placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           className={styles.searchInput}
