@@ -1,0 +1,112 @@
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import mockMemory from "../api/mockMemory"; // mock 데이터
+import { ReactComponent as LikeIcon } from "../assets/favicon_s.svg";
+import { ReactComponent as CommentIcon } from "../assets/icon_bubble.svg";
+import { ReactComponent as Logo } from "../assets/logo.svg"; // 로고 추가
+import { ReactComponent as LikeButton } from "../assets/likeButton.svg"; // 공감 보내기 버튼용 SVG
+import { likePost } from "../api/postApi"; // 게시글 공감 API 호출 함수
+import styles from "./MemoryDetailPage.module.css";
+
+function MemoryDetailPage() {
+  const { postId } = useParams();
+  const [memory, setMemory] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchMemoryDetail = async () => {
+      try {
+        const foundMemory = mockMemory.find(
+          (memory) => memory.id === parseInt(postId)
+        );
+        if (!foundMemory) {
+          throw new Error("게시글을 찾을 수 없습니다.");
+        }
+        setMemory(foundMemory);
+        setLoading(false);
+      } catch (err) {
+        setError("게시글을 불러오는 데 실패했습니다.");
+        setLoading(false);
+      }
+    };
+    fetchMemoryDetail();
+  }, [postId]);
+
+  // 공감 보내기 처리 함수
+  const handleLike = async () => {
+    try {
+      await likePost(postId); // 공감 API 호출
+      setMemory((prevMemory) => ({
+        ...prevMemory,
+        likeCount: prevMemory.likeCount + 1, // 공감 수 업데이트
+      }));
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
+
+  if (loading) return <div className={styles.loading}>로딩 중...</div>;
+  if (error) return <div className={styles.error}>{error}</div>;
+
+  return (
+    <div className={styles.memoryDetailContainer}>
+      <header className={styles.header}>
+        <Logo className={styles.logo} onClick={() => navigate("/")} />
+      </header>
+      <div className={styles.metaInfo}>
+        <div className={styles.authorInfo}>
+          <span className={styles.author}>{memory.nickname}</span> ・
+          <span className={styles.visibility}>
+            {memory.isPublic ? "공개" : "비공개"}
+          </span>
+        </div>
+        <div className={styles.managementButtons}>
+          <button className={styles.textButton}>추억 수정하기</button>
+          <button className={styles.textButton}>추억 삭제하기</button>
+        </div>
+      </div>
+      <h1 className={styles.title}>{memory.title}</h1>
+      <div className={styles.tags}>
+        {memory.tags.map((tag, index) => (
+          <span key={index}>#{tag} </span>
+        ))}
+      </div>
+      <div className={styles.interactionsWrapper}>
+        <div className={styles.interactionsLeft}>
+          <span className={styles.location}>{memory.location}</span>・
+          <span className={styles.date}>{memory.moment}</span>
+          <LikeIcon className={styles.icon} />
+          <span className={styles.likeCount}>{memory.likeCount}</span>
+          <CommentIcon className={styles.icon} />
+          <span className={styles.commentCount}>{memory.commentCount}</span>
+        </div>
+        <div className={styles.interactionsRight}>
+          {/* LikeButton 자체에 onClick 이벤트 추가 */}
+          <LikeButton className={styles.likeButton} onClick={handleLike} />
+        </div>
+      </div>
+      <div className={styles.separator}></div> {/* 회색 선 추가 */}
+      <div className={styles.content}>
+        <img
+          src={memory.imageUrl}
+          alt={memory.title}
+          className={styles.image}
+        />
+        <p className={styles.description}>{memory.content}</p>
+      </div>
+      <button className={styles.commentButton}>댓글 등록하기</button>
+      <div className={styles.commentSection}>
+        <h2 className={styles.commentHeader}>
+          <span>댓글</span>
+          <span>{memory.commentCount}</span>
+        </h2>
+        <div className={styles.commentSeparator}></div>
+        <ul className={styles.commentList}>{/* 여기에 댓글 데이터 */}</ul>
+      </div>
+    </div>
+  );
+}
+
+export default MemoryDetailPage;

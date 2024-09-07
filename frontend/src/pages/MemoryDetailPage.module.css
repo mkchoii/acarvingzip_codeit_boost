@@ -1,0 +1,196 @@
+.memoryDetailContainer {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  padding-bottom: 200px;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.logo {
+  cursor: pointer;
+  width: 150px;
+}
+
+.metaInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.visibility {
+  color: #8d8d8d;
+}
+
+.managementButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.textButton {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #282828;
+  cursor: pointer;
+}
+
+.textButton:hover {
+  text-decoration: underline;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.tags {
+  margin-bottom: 20px;
+}
+
+.tags span {
+  margin-right: 10px; /* 태그들 사이 간격 */
+  color: #b8b8b8;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.interactionsWrapper {
+  display: flex;
+  justify-content: space-between; /* 요소를 좌우로 배치 */
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.interactionsLeft {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 700;
+  gap: 10px;
+}
+
+.date {
+  margin-right: 20px;
+}
+
+.interactionsRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.likeCount,
+.commentCount {
+  color: #8d8d8d;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  fill: #666;
+}
+
+.likeButton {
+  width: 150px;
+  height: 80px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.separator {
+  margin-top: 30px;
+  margin-bottom: 50px;
+  border-top: 1px solid #ddd; /* 회색 선 */
+}
+
+.content {
+  margin-bottom: 30px;
+  padding-top: 10px;
+}
+
+.image {
+  width: 80%; /* 이미지 너비를 80%로 설정 */
+  max-height: 800px;
+  object-fit: cover;
+  margin: 0 auto 20px auto; /* 가운데 정렬 */
+  display: block;
+  border-radius: 6px;
+  margin-bottom: 50px;
+}
+
+.description {
+  font-size: 20px;
+  line-height: 1.6;
+  margin-bottom: 100px !important;
+  width: 80%;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.commentButton {
+  display: block;
+  margin: 50px auto;
+  margin-bottom: 100px;
+  width: 80%;
+  max-width: 400px;
+  padding: 12px;
+  font-size: 16px;
+  text-align: center;
+  background-color: #282828;
+  color: #fafafa;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.commentButton:hover {
+  background-color: #333;
+}
+
+.commentSection {
+  margin-top: 40px;
+}
+
+.commentHeader {
+  color: #282828;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  text-align: left; /* 왼쪽 정렬 */
+}
+
+.commentHeader span:first-child {
+  margin-right: 10px;
+}
+
+.commentSeparator {
+  height: 1.5px; /* 두께 */
+  background-color: #282828;
+  margin-bottom: 20px;
+}
+
+.loading {
+  text-align: center;
+}
+
+.error {
+  color: #ff5757;
+  text-align: center;
+  margin-top: 20px;
+}
