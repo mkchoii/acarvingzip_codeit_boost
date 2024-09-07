@@ -4,6 +4,7 @@ import CreateGroupPage from "./pages/CreateGroupPage";
 import PrivateGroupAccessPage from "./pages/PrivateGroupAccessPage";
 import GroupDetailPage from "./pages/GroupDetailPage";
 import MemoryUploadPage from "./pages/MemoryUploadPage";
+import MemoryDetailPage from "./pages/MemoryDetailPage";
 import PrivatePostAccessPage from "./pages/PrivatePostAccessPage";
 import NotFoundPage from "./pages/404Page";
 
@@ -27,6 +28,7 @@ function Main() {
           path="/post/:postId/access"
           element={<PrivatePostAccessPage />} // 비공식 게시글 접근 권한 페이지 라우트
         />
+        <Route path="/post/:postId" element={<MemoryDetailPage />} />
 
         {/* 404 페이지 라우팅 */}
         <Route path="*" element={<NotFoundPage />} />

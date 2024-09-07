@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom"; // useParams 추가
 import styles from "./PrivatePostAccessPage.module.css";
 import { ReactComponent as Logo } from "../assets/logo.svg";
 import { checkPrivatePostAccess } from "../api/postApi"; // 비공개 메모리 접근 권한 확인 API 함수 임포트
 import Modal from "../components/Modal"; // 모달 컴포넌트 임포트
 
-function PrivatePostAccessPage({ postId }) {
+function PrivatePostAccessPage() {
+  const { postId } = useParams(); // URL에서 postId를 가져옴
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 추가
