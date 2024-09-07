@@ -1,26 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MemoryCard from "../components/MemoryCard";
 import styles from "./PublicGroupDetail.module.css";
 import noPostsImage from "../assets/emptyMemory.svg";
 
-function PublicGroupDetail({ group, memories }) {
-  const [visibleMemories, setVisibleMemories] = useState(8); // 초기 상태로 10개의 메모리를 표시
+function PublicGroupDetail({ memories, selectedFilter }) {
+  const [visibleMemories, setVisibleMemories] = useState(8);
+  const [filteredMemories, setFilteredMemories] = useState([]);
+
+  useEffect(() => {
+    const filterMemories = () => {
+      const sortBy = {
+        mostLiked: (a, b) => (b.likeCount || 0) - (a.likeCount || 0), // 공감순
+        latest: (a, b) =>
+          new Date(b.createdAt || 0) - new Date(a.createdAt || 0), // 최신순
+        mostCommented: (a, b) => (b.commentCount || 0) - (a.commentCount || 0), // 댓글순 추가
+      };
+
+      const sortedMemories = [...memories].sort(
+        sortBy[selectedFilter] || sortBy.mostLiked
+      );
+      setFilteredMemories(sortedMemories);
+    };
+
+    filterMemories();
+  }, [selectedFilter, memories]);
 
   const handleLoadMore = () => {
-    setVisibleMemories((prev) => prev + 8); // 더보기 버튼 클릭 시 10개씩 추가로 표시
+    setVisibleMemories((prev) => prev + 8);
   };
 
   return (
     <div className={styles.groupDetail}>
       <div className={styles.posts}>
-        {memories.length > 0 ? (
+        {filteredMemories.length > 0 ? (
           <>
             <div className={styles.postList}>
-              {memories.slice(0, visibleMemories).map((post) => (
+              {filteredMemories.slice(0, visibleMemories).map((post) => (
                 <MemoryCard key={post.id} post={post} isPublic={true} />
               ))}
             </div>
-            {visibleMemories < memories.length && (
+            {visibleMemories < filteredMemories.length && (
               <button
                 className={styles.loadMoreButton}
                 onClick={handleLoadMore}

@@ -1,37 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MemoryCard from "../components/MemoryCard";
 import styles from "./PrivateGroupDetail.module.css";
 import noPostsImage from "../assets/emptyMemory.svg";
 
-function PrivateGroupDetail({ group, memories }) {
+function PrivateGroupDetail({ group, memories, selectedFilter }) {
   const [visibleMemories, setVisibleMemories] = useState(8);
+  const [filteredMemories, setFilteredMemories] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const filterMemories = () => {
+      const sortBy = {
+        mostLiked: (a, b) => (b.likeCount || 0) - (a.likeCount || 0), // 공감순
+        latest: (a, b) =>
+          new Date(b.createdAt || 0) - new Date(a.createdAt || 0), // 최신순
+        mostCommented: (a, b) => (b.commentCount || 0) - (a.commentCount || 0), // 댓글순 추가
+      };
+
+      const sortedMemories = [...memories].sort(
+        sortBy[selectedFilter] || sortBy.mostLiked
+      );
+      setFilteredMemories(sortedMemories);
+    };
+
+    filterMemories();
+  }, [selectedFilter, memories]);
 
   const handleLoadMore = () => {
     setVisibleMemories((prev) => prev + 8);
   };
 
   const handleMemoryClick = (postId) => {
-    navigate(`/post/${postId}/access`); // 비공식 메모리 접근 권한 페이지로 이동
+    navigate(`/post/${postId}/access`);
   };
 
   return (
     <div className={styles.groupDetail}>
       <div className={styles.posts}>
-        {memories.length > 0 ? (
+        {filteredMemories.length > 0 ? (
           <>
             <div className={styles.postList}>
-              {memories.slice(0, visibleMemories).map((post) => (
+              {filteredMemories.slice(0, visibleMemories).map((post) => (
                 <MemoryCard
                   key={post.id}
                   post={post}
                   isPublic={false}
-                  onClick={handleMemoryClick} // 클릭 핸들러 추가
+                  onClick={handleMemoryClick}
                 />
               ))}
             </div>
-            {visibleMemories < memories.length && (
+            {visibleMemories < filteredMemories.length && (
               <button
                 className={styles.loadMoreButton}
                 onClick={handleLoadMore}

@@ -10,10 +10,10 @@ import PostBadge from "../assets/badge_post.png";
 import PostLikeBadge from "../assets/badge_postLike.png";
 import PrivateGroupDetail from "../pages/PrivateGroupDetail";
 import PublicGroupDetail from "../pages/PublicGroupDetail";
-import GroupDeleteModal from "../components/GroupDeleteModal"; // 삭제 모달 임포트
-import GroupUpdateModal from "../components/GroupUpdateModal"; // 수정 모달 임포트
+import GroupDeleteModal from "../components/GroupDeleteModal";
+import GroupUpdateModal from "../components/GroupUpdateModal";
 import styles from "./GroupDetailPage.module.css";
-import { likeGroup, updateGroup, deleteGroup } from "../api/groupApi"; // API 호출
+import { likeGroup, updateGroup, deleteGroup } from "../api/groupApi";
 
 function GroupDetailPage() {
   const { groupId } = useParams();
@@ -24,8 +24,8 @@ function GroupDetailPage() {
   const [selectedFilter, setSelectedFilter] = useState("mostLiked");
   const [activeTab, setActiveTab] = useState("public");
   const [filteredMemories, setFilteredMemories] = useState([]);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false); // 수정 모달 상태
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달 상태
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
@@ -65,7 +65,7 @@ function GroupDetailPage() {
 
   useEffect(() => {
     if (groupDetail) {
-      const filtered = mockMemories
+      let filtered = mockMemories
         .filter(
           (memory) =>
             memory.groupId === parseInt(groupId) &&
@@ -83,9 +83,17 @@ function GroupDetailPage() {
           return matchesTitle || matchesTags;
         });
 
+      const sortBy = {
+        mostLiked: (a, b) => (b.likeCount || 0) - (a.likeCount || 0), // 공감순
+        latest: (a, b) =>
+          new Date(b.createdAt || 0) - new Date(a.createdAt || 0), // 최신순
+        mostCommented: (a, b) => (b.commentCount || 0) - (a.commentCount || 0), // 댓글순 추가
+      };
+
+      filtered = filtered.sort(sortBy[selectedFilter] || sortBy.mostLiked);
       setFilteredMemories(filtered);
     }
-  }, [activeTab, groupDetail, groupId, searchTerm]);
+  }, [activeTab, groupDetail, groupId, searchTerm, selectedFilter]);
 
   const handleSearchChange = (term) => {
     setSearchTerm(term);
@@ -115,25 +123,23 @@ function GroupDetailPage() {
     setActiveTab(tab);
   };
 
-  // 그룹 수정 처리 함수
   const handleGroupUpdate = async (updatedData) => {
     try {
-      await updateGroup(groupId, updatedData); // API 호출
+      await updateGroup(groupId, updatedData);
       alert("그룹 정보가 성공적으로 수정되었습니다.");
-      setGroupDetail((prevDetail) => ({ ...prevDetail, ...updatedData })); // 그룹 정보 업데이트
-      setIsUpdateModalOpen(false); // 모달 닫기
+      setGroupDetail((prevDetail) => ({ ...prevDetail, ...updatedData }));
+      setIsUpdateModalOpen(false);
     } catch (error) {
       alert(error.message);
     }
   };
 
-  // 그룹 삭제 처리 함수
   const handleGroupDelete = async (password) => {
     try {
-      await deleteGroup(groupId, password); // API 호출
+      await deleteGroup(groupId, password);
       alert("그룹이 성공적으로 삭제되었습니다.");
-      setIsDeleteModalOpen(false); // 모달 닫기
-      navigate("/"); // 그룹 삭제 후 메인 페이지로 이동
+      setIsDeleteModalOpen(false);
+      navigate("/");
     } catch (error) {
       alert(error.message);
     }
@@ -235,12 +241,25 @@ function GroupDetailPage() {
             activeTab={activeTab}
             onTabChange={handleTabChange}
             placeholder="태그 혹은 제목을 입력해주세요."
+            sortOptions={[
+              { label: "공감순", value: "mostLiked" },
+              { label: "최신순", value: "latest" },
+              { label: "댓글순", value: "mostCommented" }, // 댓글순 추가
+            ]}
           />
         </div>
         {activeTab === "public" ? (
-          <PublicGroupDetail group={groupDetail} memories={filteredMemories} />
+          <PublicGroupDetail
+            group={groupDetail}
+            memories={filteredMemories}
+            selectedFilter={selectedFilter}
+          />
         ) : (
-          <PrivateGroupDetail group={groupDetail} memories={filteredMemories} />
+          <PrivateGroupDetail
+            group={groupDetail}
+            memories={filteredMemories}
+            selectedFilter={selectedFilter}
+          />
         )}
       </div>
 
