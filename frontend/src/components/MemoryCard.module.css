@@ -6,7 +6,7 @@
   background-color: #fafafa;
   margin-bottom: 20px;
   width: 100%;
-  max-width: 350px;
+  max-width: 375px !important;
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -44,18 +44,24 @@
   font-weight: 700;
   color: #282828;
   margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 넘칠 경우 ...으로 표시 */
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .tag {
   margin-right: 8px;
   font-size: 12px;
   color: #b8b8b8;
+  white-space: nowrap;
 }
 
 .footer {

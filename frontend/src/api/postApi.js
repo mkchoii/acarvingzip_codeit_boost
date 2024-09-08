@@ -25,6 +25,46 @@ export const createPost = async (groupId, postData) => {
   }
 };
 
+export const fetchPostList = async ({
+  page,
+  pageSize,
+  sortBy,
+  keyword,
+  isPublic,
+  groupId,
+}) => {
+  try {
+    const queryParams = new URLSearchParams({
+      page,
+      pageSize,
+      sortBy,
+      keyword,
+      isPublic,
+      groupId,
+    }).toString();
+
+    const response = await fetch(
+      `/api/groups/${groupId}/posts?${queryParams}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("게시글 목록을 가져오는 데 실패했습니다.");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching post list:", error);
+    throw error;
+  }
+};
+
 // 비공개 게시글 접근 권한 확인
 export const checkPrivatePostAccess = async (postId, password) => {
   try {
