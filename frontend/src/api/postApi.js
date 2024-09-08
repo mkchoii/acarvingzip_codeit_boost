@@ -103,3 +103,36 @@ export const likePost = async (postId) => {
     throw error;
   }
 };
+
+// 게시글 삭제
+export const deletePost = async (postId, postPassword) => {
+  try {
+    const response = await fetch(`/api/posts/${postId}/delete`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ postPassword }),
+    });
+
+    // 응답 처리
+    if (response.ok) {
+      const data = await response.json();
+      return { success: true, message: data.message }; // 성공 응답
+    } else if (response.status === 400) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "잘못된 요청입니다.");
+    } else if (response.status === 403) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "비밀번호가 틀렸습니다.");
+    } else if (response.status === 404) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "게시글이 존재하지 않습니다.");
+    } else {
+      throw new Error("게시글 삭제에 실패했습니다.");
+    }
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    return { success: false, message: error.message };
+  }
+};

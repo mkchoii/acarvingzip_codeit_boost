@@ -5,7 +5,8 @@ import { ReactComponent as LikeIcon } from "../assets/favicon_s.svg";
 import { ReactComponent as CommentIcon } from "../assets/icon_bubble.svg";
 import { ReactComponent as Logo } from "../assets/logo.svg"; // 로고 추가
 import { ReactComponent as LikeButton } from "../assets/likeButton.svg"; // 공감 보내기 버튼용 SVG
-import { likePost } from "../api/postApi"; // 게시글 공감 API 호출 함수
+import GroupDeleteModal from "../components/GroupDeleteModal";
+import { likePost, deletePost } from "../api/postApi"; // API 호출 함수
 import styles from "./MemoryDetailPage.module.css";
 
 function MemoryDetailPage() {
@@ -13,6 +14,7 @@ function MemoryDetailPage() {
   const [memory, setMemory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,6 +49,17 @@ function MemoryDetailPage() {
     }
   };
 
+  // 게시글 삭제 처리 함수
+  const handleDelete = async (password) => {
+    try {
+      await deletePost(postId, password); // 삭제 API 호출
+      alert("게시글이 성공적으로 삭제되었습니다.");
+      navigate("/group/:groupId"); // 삭제 후 리다이렉트
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   if (loading) return <div className={styles.loading}>로딩 중...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
 
@@ -64,7 +77,12 @@ function MemoryDetailPage() {
         </div>
         <div className={styles.managementButtons}>
           <button className={styles.textButton}>추억 수정하기</button>
-          <button className={styles.textButton}>추억 삭제하기</button>
+          <button
+            className={styles.textButton}
+            onClick={() => setIsDeleteModalOpen(true)}
+          >
+            추억 삭제하기
+          </button>
         </div>
       </div>
       <h1 className={styles.title}>{memory.title}</h1>
@@ -105,6 +123,13 @@ function MemoryDetailPage() {
         <div className={styles.commentSeparator}></div>
         <ul className={styles.commentList}>{/* 여기에 댓글 데이터 */}</ul>
       </div>
+      {isDeleteModalOpen && (
+        <GroupDeleteModal
+          title="추억 삭제"
+          onClose={() => setIsDeleteModalOpen(false)} // 모달 닫기
+          onDelete={handleDelete} // 삭제 처리 함수 연결
+        />
+      )}
     </div>
   );
 }
