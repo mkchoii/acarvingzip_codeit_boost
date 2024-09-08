@@ -14,6 +14,7 @@ import GroupDeleteModal from "../components/GroupDeleteModal";
 import GroupUpdateModal from "../components/GroupUpdateModal";
 import styles from "./GroupDetailPage.module.css";
 import { likeGroup, updateGroup, deleteGroup } from "../api/groupApi";
+// import { fetchPostList } from "../api/postApi"; // 나중에 사용
 
 function GroupDetailPage() {
   const { groupId } = useParams();
@@ -87,12 +88,33 @@ function GroupDetailPage() {
         mostLiked: (a, b) => (b.likeCount || 0) - (a.likeCount || 0), // 공감순
         latest: (a, b) =>
           new Date(b.createdAt || 0) - new Date(a.createdAt || 0), // 최신순
-        mostCommented: (a, b) => (b.commentCount || 0) - (a.commentCount || 0), // 댓글순 추가
+        mostCommented: (a, b) => (b.commentCount || 0) - (a.commentCount || 0), // 댓글순
       };
 
       filtered = filtered.sort(sortBy[selectedFilter] || sortBy.mostLiked);
       setFilteredMemories(filtered);
     }
+
+    // 나중에 사용될 fetchPostList 함수 호출은 주석 처리
+    /*
+    const loadPostList = async () => {
+      try {
+        const response = await fetchPostList({
+          page: 1,
+          pageSize: 8,
+          sortBy: selectedFilter,
+          keyword: searchTerm,
+          isPublic: activeTab === "public",
+          groupId,
+        });
+        setFilteredMemories(response.data);
+      } catch (err) {
+        setError("게시글 목록을 불러오는 중 오류가 발생했습니다.");
+      }
+    };
+
+    loadPostList();
+    */
   }, [activeTab, groupDetail, groupId, searchTerm, selectedFilter]);
 
   const handleSearchChange = (term) => {
