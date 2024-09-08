@@ -6,7 +6,9 @@ import { ReactComponent as CommentIcon } from "../assets/icon_bubble.svg";
 import { ReactComponent as Logo } from "../assets/logo.svg"; // 로고 추가
 import { ReactComponent as LikeButton } from "../assets/likeButton.svg"; // 공감 보내기 버튼용 SVG
 import GroupDeleteModal from "../components/GroupDeleteModal";
-import { likePost, deletePost } from "../api/postApi"; // API 호출 함수
+import MemoryUpdateModal from "../components/MemoryUpdateModal"; // 수정 모달 임포트
+// import { getPostDetail, likePost, deletePost } from "../api/postApi"; // getPostDetail만 주석 처리
+import { likePost, deletePost } from "../api/postApi"; // 공감, 삭제는 API 사용
 import styles from "./MemoryDetailPage.module.css";
 
 function MemoryDetailPage() {
@@ -15,11 +17,13 @@ function MemoryDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false); // 수정 모달 상태 추가
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMemoryDetail = async () => {
       try {
+        // const foundMemory = await getPostDetail(postId); // 실제 API 호출 (주석 처리)
         const foundMemory = mockMemory.find(
           (memory) => memory.id === parseInt(postId)
         );
@@ -76,10 +80,15 @@ function MemoryDetailPage() {
           </span>
         </div>
         <div className={styles.managementButtons}>
-          <button className={styles.textButton}>추억 수정하기</button>
           <button
             className={styles.textButton}
-            onClick={() => setIsDeleteModalOpen(true)}
+            onClick={() => setIsUpdateModalOpen(true)} // 수정 모달 열기
+          >
+            추억 수정하기
+          </button>
+          <button
+            className={styles.textButton}
+            onClick={() => setIsDeleteModalOpen(true)} // 삭제 모달 열기
           >
             추억 삭제하기
           </button>
@@ -128,6 +137,17 @@ function MemoryDetailPage() {
           title="추억 삭제"
           onClose={() => setIsDeleteModalOpen(false)} // 모달 닫기
           onDelete={handleDelete} // 삭제 처리 함수 연결
+        />
+      )}
+      {isUpdateModalOpen && (
+        <MemoryUpdateModal
+          postId={postId}
+          initialData={memory} // 게시글 데이터를 모달로 전달
+          onClose={() => setIsUpdateModalOpen(false)} // 모달 닫기
+          onSuccess={() => {
+            alert("게시글이 성공적으로 수정되었습니다.");
+            window.location.reload(); // 페이지 새로고침
+          }}
         />
       )}
     </div>
