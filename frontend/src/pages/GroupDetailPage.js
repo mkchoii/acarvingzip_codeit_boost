@@ -274,8 +274,9 @@ function GroupDetailPage() {
 
       {isDeleteModalOpen && (
         <GroupDeleteModal
-          onClose={() => setIsDeleteModalOpen(false)}
+          title="그룹 삭제"
           onDelete={handleGroupDelete}
+          onClose={() => setIsDeleteModalOpen(false)}
         />
       )}
     </div>

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import styles from "./GroupDeleteModal.module.css";
 import { ReactComponent as CloseIcon } from "../assets/icon_x.svg"; // X 아이콘 임포트
 
-function GroupDeleteModal({ onClose, onDelete }) {
+// title을 props로 받도록 수정
+function GroupDeleteModal({ title, onClose, onDelete }) {
   const [password, setPassword] = useState(""); // 비밀번호 상태
 
   const handleDelete = () => {
@@ -17,7 +18,8 @@ function GroupDeleteModal({ onClose, onDelete }) {
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>그룹 삭제</h2>
+          <h2 className={styles.modalTitle}>{title}</h2>{" "}
+          {/* 동적으로 제목 변경 */}
           <CloseIcon onClick={onClose} className={styles.closeIcon} />
         </div>
         <p className={styles.modalDescription}>삭제 권한 인증</p>
