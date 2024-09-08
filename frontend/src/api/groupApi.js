@@ -61,7 +61,7 @@ export const fetchGroups = async (
 // 비공개 그룹 접근 권한 확인
 export const checkPrivateGroupAccess = async (groupId, password) => {
   try {
-    const response = await fetch(`/api/groups/${groupId}/access`, {
+    const response = await fetch(`/api/groups/${groupId}/verify-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,0 +1,196 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.modalContent {
+  background-color: #fafafa;
+  border-radius: 12px;
+  padding: 40px;
+  width: 900px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.modalHeader h2 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.closeButton svg {
+  width: 24px;
+  height: 24px;
+  fill: #333;
+}
+
+.form {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.leftColumn,
+.rightColumn {
+  width: 48%;
+}
+
+.rightColumn {
+  margin-left: 90px;
+}
+
+.separator {
+  width: 2px;
+  background-color: #ddd;
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  bottom: 20px;
+  height: calc(100% - 240px);
+  margin-left: -1px;
+  margin-top: 90px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="password"],
+.formGroup textarea {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.fileInputWrapper {
+  display: flex;
+  align-items: center;
+  max-width: 400px; /* 전체 너비를 400px로 고정 */
+}
+
+.fileInputWrapper input[type="text"] {
+  flex-grow: 1;
+  margin-right: 10px;
+  padding: 12px;
+  width: calc(100% - 160px); /* 파일 선택 버튼 크기를 고려하여 줄임 */
+}
+
+.fileSelectButton {
+  padding: 12px 18px;
+  font-size: 14px;
+  background-color: #fafafa;
+  color: #282828;
+  border: 1px solid #282828;
+  border-radius: 6px;
+  height: 44px;
+  cursor: pointer;
+  min-width: 100px; /* 파일 선택 버튼의 너비 설정 */
+}
+
+.submitButton {
+  width: 400px;
+  padding: 14px;
+  background-color: #282828;
+  color: #fafafa;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submitButton:hover {
+  background-color: #333;
+}
+
+.centerButton {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.toggleWrapper {
+  display: flex;
+  align-items: center; /* 텍스트와 버튼을 수직으로 정렬 */
+  gap: 10px; /* 텍스트와 버튼 사이의 간격 설정 */
+}
+
+.toggleLabel {
+  font-size: 14px;
+  color: #333;
+}
+
+.toggleButton {
+  cursor: pointer;
+}
+
+.toggleIcon {
+  width: 60px;
+  height: 30px;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.tag {
+  display: inline-block;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 400 !important;
+  color: #8d8d8d;
+}
+
+.removeTagButton {
+  margin-left: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #8d8d8d;
+}

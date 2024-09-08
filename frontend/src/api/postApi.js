@@ -25,6 +25,7 @@ export const createPost = async (groupId, postData) => {
   }
 };
 
+// 게시글 목록 조회
 export const fetchPostList = async ({
   page,
   pageSize,
@@ -147,7 +148,7 @@ export const likePost = async (postId) => {
 // 게시글 삭제
 export const deletePost = async (postId, postPassword) => {
   try {
-    const response = await fetch(`/api/posts/${postId}/delete`, {
+    const response = await fetch(`/api/posts/${postId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -174,5 +175,40 @@ export const deletePost = async (postId, postPassword) => {
   } catch (error) {
     console.error("Error deleting post:", error);
     return { success: false, message: error.message };
+  }
+};
+
+// 게시글 수정하기
+export const updatePost = async (postId, postData) => {
+  const url = `/api/posts/${postId}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(postData),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("게시글 수정 성공:", data);
+      return data;
+    } else if (response.status === 400) {
+      const errorData = await response.json();
+      throw new Error(`잘못된 요청: ${errorData.message}`);
+    } else if (response.status === 403) {
+      const errorData = await response.json();
+      throw new Error(`비밀번호가 틀렸습니다: ${errorData.message}`);
+    } else if (response.status === 404) {
+      const errorData = await response.json();
+      throw new Error(`존재하지 않는 게시글입니다: ${errorData.message}`);
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다.");
+    }
+  } catch (error) {
+    console.error("게시글 수정 실패:", error.message);
+    throw error;
   }
 };

@@ -45,10 +45,12 @@
   font-size: 14px;
   color: #282828;
   cursor: pointer;
+  transition: none;
 }
 
 .textButton:hover {
   text-decoration: underline;
+  background: none !important;
 }
 
 .title {
