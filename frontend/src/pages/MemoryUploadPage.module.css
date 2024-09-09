@@ -29,7 +29,7 @@
 }
 
 form {
-  width: 800px;
+  width: 800px !important;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -161,7 +161,7 @@ form {
 }
 
 .submitButton:hover {
-  background-color: #8d8d8d;
+  background-color: #444;
 }
 
 .inputError {

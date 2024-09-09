@@ -7,7 +7,8 @@ import { ReactComponent as Logo } from "../assets/logo.svg"; // 로고 추가
 import { ReactComponent as LikeButton } from "../assets/likeButton.svg"; // 공감 보내기 버튼용 SVG
 import GroupDeleteModal from "../components/GroupDeleteModal";
 import MemoryUpdateModal from "../components/MemoryUpdateModal"; // 수정 모달 임포트
-// import { getPostDetail, likePost, deletePost } from "../api/postApi"; // getPostDetail만 주석 처리
+import CommentModal from "../components/CommentModal"; // 댓글 등록 모달 임포트
+import CommentList from "../components/CommentList"; // 댓글 목록 컴포넌트 추가
 import { likePost, deletePost } from "../api/postApi"; // 공감, 삭제는 API 사용
 import styles from "./MemoryDetailPage.module.css";
 
@@ -17,7 +18,8 @@ function MemoryDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false); // 수정 모달 상태 추가
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false); // 댓글 모달 상태 추가
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -110,7 +112,6 @@ function MemoryDetailPage() {
           <span className={styles.commentCount}>{memory.commentCount}</span>
         </div>
         <div className={styles.interactionsRight}>
-          {/* LikeButton 자체에 onClick 이벤트 추가 */}
           <LikeButton className={styles.likeButton} onClick={handleLike} />
         </div>
       </div>
@@ -123,14 +124,22 @@ function MemoryDetailPage() {
         />
         <p className={styles.description}>{memory.content}</p>
       </div>
-      <button className={styles.commentButton}>댓글 등록하기</button>
+      <button
+        className={styles.commentButton}
+        onClick={() => {
+          setIsCommentModalOpen(true); // 댓글 모달 열기
+        }}
+      >
+        댓글 등록하기
+      </button>
       <div className={styles.commentSection}>
         <h2 className={styles.commentHeader}>
           <span>댓글</span>
           <span>{memory.commentCount}</span>
         </h2>
         <div className={styles.commentSeparator}></div>
-        <ul className={styles.commentList}>{/* 여기에 댓글 데이터 */}</ul>
+        {/* CommentList 추가 */}
+        <CommentList postId={postId} />
       </div>
       {isDeleteModalOpen && (
         <GroupDeleteModal
@@ -147,6 +156,19 @@ function MemoryDetailPage() {
           onSuccess={() => {
             alert("게시글이 성공적으로 수정되었습니다.");
             window.location.reload(); // 페이지 새로고침
+          }}
+        />
+      )}
+      {isCommentModalOpen && (
+        <CommentModal
+          postId={postId}
+          onClose={() => setIsCommentModalOpen(false)} // 모달 닫기
+          onAddComment={(newComment) => {
+            // 새 댓글을 처리
+            setMemory((prevMemory) => ({
+              ...prevMemory,
+              commentCount: prevMemory.commentCount + 1, // 댓글 수 업데이트
+            }));
           }}
         />
       )}
