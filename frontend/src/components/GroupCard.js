@@ -57,6 +57,7 @@ function GroupCard({ group }) {
         <div className={styles.footer}>
           <div className={styles.footerSection}>
             <span className={styles.label}>획득 배지</span>
+            {/* badgeCount로 배지 개수만 표시 */}
             <span className={styles.data}>{group.badgeCount}</span>
           </div>
           <div className={styles.footerSection}>
