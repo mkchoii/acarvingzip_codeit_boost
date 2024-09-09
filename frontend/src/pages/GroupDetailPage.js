@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
-import mockGroups from "../api/mockGroups"; // 여전히 mockGroups를 사용
 import { ReactComponent as Logo } from "../assets/logo.svg";
 import { ReactComponent as LikeButtonIcon } from "../assets/likeButton.svg";
 import GroupLikeBadge from "../assets/badge_groupLike.png";
@@ -12,7 +11,12 @@ import PublicGroupDetail from "../pages/PublicGroupDetail";
 import GroupDeleteModal from "../components/GroupDeleteModal";
 import GroupUpdateModal from "../components/GroupUpdateModal";
 import styles from "./GroupDetailPage.module.css";
-import { likeGroup, updateGroup, deleteGroup } from "../api/groupApi";
+import {
+  likeGroup,
+  updateGroup,
+  deleteGroup,
+  fetchGroupDetail,
+} from "../api/groupApi"; // 실제 그룹 상세 조회 API 사용
 import { fetchPostList } from "../api/postApi"; // 실제 게시글 목록 조회 API 사용
 
 function GroupDetailPage() {
@@ -61,10 +65,8 @@ function GroupDetailPage() {
   useEffect(() => {
     const loadGroupDetail = async () => {
       try {
-        // 여전히 mockGroups를 사용하여 그룹 데이터를 로드하는 부분
-        const group = mockGroups.find(
-          (group) => group.id === parseInt(groupId)
-        );
+        // 실제 그룹 상세 조회 API 호출
+        const group = await fetchGroupDetail(groupId);
 
         if (!group) {
           throw new Error("그룹을 찾을 수 없습니다.");
