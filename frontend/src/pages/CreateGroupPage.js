@@ -80,12 +80,15 @@ function CreateGroupPage() {
         title: "그룹 만들기 성공",
         message: "그룹이 성공적으로 등록되었습니다.",
       });
+      setModalOpen(true);
+
+      // 그룹 생성 후 홈 페이지로 리디렉션
+      navigate("/");
     } catch (error) {
       setModalContent({
         title: "그룹 만들기 실패",
         message: "그룹 등록에 실패했습니다.",
       });
-    } finally {
       setModalOpen(true);
     }
   };

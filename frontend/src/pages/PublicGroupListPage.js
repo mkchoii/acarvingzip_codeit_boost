@@ -3,14 +3,15 @@ import { useNavigate } from "react-router-dom";
 import GroupCard from "../components/GroupCard";
 import styles from "./PublicGroupListPage.module.css";
 import emptyGroupImage from "../assets/emptyGroup.svg";
-import mockGroups from "../api/mockGroups";
+import { fetchGroups } from "../api/groupApi"; // 그룹 목록 조회 API 임포트
 
 const initialState = {
   groups: [],
   loading: true,
   error: false,
   displayedGroups: [],
-  itemsToShow: 10,
+  page: 1, // 현재 페이지 번호
+  itemsPerPage: 8, // 페이지당 아이템 수
   allItemsLoaded: false,
 };
 
@@ -23,20 +24,19 @@ function reducer(state, action) {
         error: false,
       };
     case "FETCH_SUCCESS":
+      const newGroups = [...state.groups, ...action.payload];
       return {
         ...state,
         loading: false,
-        groups: action.payload,
-        displayedGroups: action.payload.slice(0, state.itemsToShow),
-        allItemsLoaded: action.payload.length <= state.itemsToShow,
+        groups: newGroups,
+        displayedGroups: newGroups.slice(0, state.page * state.itemsPerPage),
+        allItemsLoaded: action.payload.length < state.itemsPerPage,
       };
     case "LOAD_MORE":
-      const moreItems = state.groups.slice(
-        0,
-        state.displayedGroups.length + action.payload
-      );
+      const moreItems = state.groups.slice(0, state.page * state.itemsPerPage);
       return {
         ...state,
+        page: state.page + 1, // 페이지 증가
         displayedGroups: moreItems,
         allItemsLoaded: moreItems.length >= state.groups.length,
       };
@@ -56,36 +56,50 @@ function PublicGroupListPage({
   selectedFilter = "mostLiked",
 }) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { groups, loading, error, displayedGroups, allItemsLoaded } = state;
+  const {
+    groups,
+    loading,
+    error,
+    displayedGroups,
+    allItemsLoaded,
+    page,
+    itemsPerPage,
+  } = state;
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchGroups = async () => {
+    const fetchGroupsData = async () => {
       console.log("PublicGroupListPage 데이터 가져오기 시작");
       dispatch({ type: "FETCH_INIT" });
 
       try {
-        let fetchedGroups = mockGroups.filter((group) => group.isPublic);
-        console.log("공개 그룹 필터링 후:", fetchedGroups);
+        // 그룹 목록 조회 API 호출, 페이지당 8개씩 가져오기
+        const response = await fetchGroups(
+          page,
+          itemsPerPage,
+          selectedFilter,
+          searchTerm,
+          true
+        );
+        let fetchedGroups = response.data;
 
+        // 검색어 필터링
         if (searchTerm) {
           fetchedGroups = fetchedGroups.filter((group) =>
             group.name.toLowerCase().includes(searchTerm.toLowerCase())
           );
-          console.log("검색어 필터링 후:", fetchedGroups);
         }
 
+        // 필터에 따른 정렬
         const sortBy = {
           mostLiked: (a, b) => b.likeCount - a.likeCount,
           latest: (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
           mostPosted: (a, b) => b.postCount - a.postCount,
-          mostBadge: (a, b) => b.badgeCount - a.badgeCount,
+          mostBadge: (a, b) => b.badges.length - a.badges.length,
         };
 
         const sortFunction = sortBy[selectedFilter] || sortBy.mostLiked;
         fetchedGroups.sort(sortFunction);
-
-        console.log("정렬 후 그룹:", fetchedGroups);
 
         dispatch({ type: "FETCH_SUCCESS", payload: fetchedGroups });
       } catch (err) {
@@ -94,11 +108,11 @@ function PublicGroupListPage({
       }
     };
 
-    fetchGroups();
-  }, [selectedFilter, searchTerm]);
+    fetchGroupsData();
+  }, [selectedFilter, searchTerm, page, itemsPerPage]);
 
   const loadMoreItems = () => {
-    dispatch({ type: "LOAD_MORE", payload: 8 });
+    dispatch({ type: "LOAD_MORE" });
   };
 
   if (loading) {
