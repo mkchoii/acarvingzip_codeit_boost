@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import mockMemory from "../api/mockMemory"; // mock 데이터
+import { getPostDetail, likePost, deletePost } from "../api/postApi"; // 공감, 삭제, 게시글 상세 API 사용
 import { ReactComponent as LikeIcon } from "../assets/favicon_s.svg";
 import { ReactComponent as CommentIcon } from "../assets/icon_bubble.svg";
 import { ReactComponent as Logo } from "../assets/logo.svg"; // 로고 추가
@@ -9,11 +9,10 @@ import GroupDeleteModal from "../components/GroupDeleteModal";
 import MemoryUpdateModal from "../components/MemoryUpdateModal"; // 수정 모달 임포트
 import CommentModal from "../components/CommentModal"; // 댓글 등록 모달 임포트
 import CommentList from "../components/CommentList"; // 댓글 목록 컴포넌트 추가
-import { likePost, deletePost } from "../api/postApi"; // 공감, 삭제는 API 사용
 import styles from "./MemoryDetailPage.module.css";
 
 function MemoryDetailPage() {
-  const { postId } = useParams();
+  const { postId, groupId } = useParams(); // URL에서 postId와 groupId 추출
   const [memory, setMemory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,13 +24,7 @@ function MemoryDetailPage() {
   useEffect(() => {
     const fetchMemoryDetail = async () => {
       try {
-        // const foundMemory = await getPostDetail(postId); // 실제 API 호출 (주석 처리)
-        const foundMemory = mockMemory.find(
-          (memory) => memory.id === parseInt(postId)
-        );
-        if (!foundMemory) {
-          throw new Error("게시글을 찾을 수 없습니다.");
-        }
+        const foundMemory = await getPostDetail(postId); // 실제 API 호출
         setMemory(foundMemory);
         setLoading(false);
       } catch (err) {
@@ -60,7 +53,7 @@ function MemoryDetailPage() {
     try {
       await deletePost(postId, password); // 삭제 API 호출
       alert("게시글이 성공적으로 삭제되었습니다.");
-      navigate("/group/:groupId"); // 삭제 후 리다이렉트
+      navigate(`/group/${groupId}`); // 삭제 후 그룹 상세 페이지로 리다이렉트
     } catch (error) {
       alert(error.message);
     }
@@ -126,9 +119,7 @@ function MemoryDetailPage() {
       </div>
       <button
         className={styles.commentButton}
-        onClick={() => {
-          setIsCommentModalOpen(true); // 댓글 모달 열기
-        }}
+        onClick={() => setIsCommentModalOpen(true)} // 댓글 모달 열기
       >
         댓글 등록하기
       </button>

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
-import mockGroups from "../api/mockGroups";
-import mockMemories from "../api/mockMemory";
+import mockGroups from "../api/mockGroups"; // 여전히 mockGroups를 사용
 import { ReactComponent as Logo } from "../assets/logo.svg";
 import { ReactComponent as LikeButtonIcon } from "../assets/likeButton.svg";
 import GroupLikeBadge from "../assets/badge_groupLike.png";
@@ -14,7 +13,7 @@ import GroupDeleteModal from "../components/GroupDeleteModal";
 import GroupUpdateModal from "../components/GroupUpdateModal";
 import styles from "./GroupDetailPage.module.css";
 import { likeGroup, updateGroup, deleteGroup } from "../api/groupApi";
-// import { fetchPostList } from "../api/postApi"; // 나중에 사용
+import { fetchPostList } from "../api/postApi"; // 실제 게시글 목록 조회 API 사용
 
 function GroupDetailPage() {
   const { groupId } = useParams();
@@ -62,6 +61,7 @@ function GroupDetailPage() {
   useEffect(() => {
     const loadGroupDetail = async () => {
       try {
+        // 여전히 mockGroups를 사용하여 그룹 데이터를 로드하는 부분
         const group = mockGroups.find(
           (group) => group.id === parseInt(groupId)
         );
@@ -83,39 +83,9 @@ function GroupDetailPage() {
   }, [groupId]);
 
   useEffect(() => {
-    if (groupDetail) {
-      let filtered = mockMemories
-        .filter(
-          (memory) =>
-            memory.groupId === parseInt(groupId) &&
-            memory.isPublic === (activeTab === "public")
-        )
-        .filter((memory) => {
-          if (!searchTerm.trim()) return true;
-          const lowerCasedTerm = searchTerm.toLowerCase();
-          const matchesTitle = memory.title
-            .toLowerCase()
-            .includes(lowerCasedTerm);
-          const matchesTags = memory.tags.some((tag) =>
-            tag.toLowerCase().includes(lowerCasedTerm)
-          );
-          return matchesTitle || matchesTags;
-        });
-
-      const sortBy = {
-        mostLiked: (a, b) => (b.likeCount || 0) - (a.likeCount || 0), // 공감순
-        latest: (a, b) =>
-          new Date(b.createdAt || 0) - new Date(a.createdAt || 0), // 최신순
-        mostCommented: (a, b) => (b.commentCount || 0) - (a.commentCount || 0), // 댓글순
-      };
-
-      filtered = filtered.sort(sortBy[selectedFilter] || sortBy.mostLiked);
-      setFilteredMemories(filtered);
-    }
-
-    // 나중에 사용될 fetchPostList 함수 호출은 주석 처리
-    /*
     const loadPostList = async () => {
+      if (!groupDetail) return;
+
       try {
         const response = await fetchPostList({
           page: 1,
@@ -132,8 +102,7 @@ function GroupDetailPage() {
     };
 
     loadPostList();
-    */
-  }, [activeTab, groupDetail, groupId, searchTerm, selectedFilter]);
+  }, [activeTab, groupDetail, searchTerm, selectedFilter, groupId]);
 
   const handleSearchChange = (term) => {
     setSearchTerm(term);
