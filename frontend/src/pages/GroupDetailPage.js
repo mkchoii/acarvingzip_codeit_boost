@@ -41,6 +41,24 @@ function GroupDetailPage() {
     return `D+${diffDays}`;
   };
 
+  // 게시글이 7일 연속으로 작성되었는지 확인하는 함수
+  const checkConsecutivePosts = (posts) => {
+    const dates = posts.map((post) => new Date(post.createdAt));
+    dates.sort((a, b) => a - b); // 날짜 순으로 정렬
+
+    let consecutiveCount = 1;
+    for (let i = 1; i < dates.length; i++) {
+      const diffDays = (dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24);
+      if (diffDays === 1) {
+        consecutiveCount++;
+        if (consecutiveCount >= 7) return true;
+      } else {
+        consecutiveCount = 1; // 연속되지 않으면 카운트 리셋
+      }
+    }
+    return false;
+  };
+
   useEffect(() => {
     const loadGroupDetail = async () => {
       try {
@@ -222,21 +240,32 @@ function GroupDetailPage() {
             <div className={styles.badgesSection}>
               <div className={styles.badgesTitle}>획득 배지</div>
               <div className={styles.badges}>
-                <img
-                  src={GroupLikeBadge}
-                  className={styles.badge}
-                  alt="그룹 공감 배지"
-                />
-                <img
-                  src={PostBadge}
-                  className={styles.badge}
-                  alt="게시글 배지"
-                />
-                <img
-                  src={PostLikeBadge}
-                  className={styles.badge}
-                  alt="게시글 공감 배지"
-                />
+                {/* 그룹 공감 배지 - 공감 수가 1만 이상일 때 */}
+                {groupDetail.likeCount >= 10000 && (
+                  <img
+                    src={GroupLikeBadge}
+                    className={styles.badge}
+                    alt="그룹 공감 1만 배지"
+                  />
+                )}
+
+                {/* 7일 연속 게시글 등록 배지 */}
+                {checkConsecutivePosts(filteredMemories) && (
+                  <img
+                    src={PostBadge}
+                    className={styles.badge}
+                    alt="7일 연속 게시글 배지"
+                  />
+                )}
+
+                {/* 게시글 공감 배지 - 게시글 공감 수가 1만 이상일 때 */}
+                {groupDetail.postLikeCount >= 10000 && (
+                  <img
+                    src={PostLikeBadge}
+                    className={styles.badge}
+                    alt="게시글 공감 1만 배지"
+                  />
+                )}
               </div>
             </div>
             <LikeButtonIcon

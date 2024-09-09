@@ -28,7 +28,7 @@ const mockGroups = [
     name: "연꽃의 미소",
     image: ex1Image,
     isPublic: true,
-    likeCount: 1800,
+    likeCount: 15000,
     badgeCount: 3,
     postCount: 10,
     createdAt: "2023-11-20T07:47:49.803Z",
