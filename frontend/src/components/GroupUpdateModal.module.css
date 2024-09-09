@@ -20,6 +20,9 @@
   max-width: 90%; /* 부모 너비에 맞춰 조정 */
   box-sizing: border-box;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 중앙 정렬 추가 */
 }
 
 .modalHeader {
@@ -48,7 +51,11 @@
 }
 
 form {
-  width: 400px !important;
+  width: 100%;
+  max-width: 400px; /* 폼의 최대 너비 설정 */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 폼 요소 중앙 정렬 */
 }
 
 .formGroup {
@@ -71,7 +78,6 @@ form {
 .formGroup input[type="password"],
 .formGroup textarea {
   width: 100%;
-  max-width: 400px;
   padding: 10px;
   font-size: 14px;
   border: 1px solid #ddd;
@@ -89,7 +95,6 @@ form {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 400px;
 }
 
 .fileInputWrapper input[type="text"] {
@@ -113,7 +118,6 @@ form {
   flex-shrink: 0;
 }
 
-/* 토글 버튼과 "공개" 라벨 정렬 */
 .toggleLabelWrapper {
   display: flex;
   align-items: center;
@@ -149,8 +153,9 @@ form {
   cursor: pointer;
   margin-top: 20px;
   text-align: center;
+  align-self: center; /* 수정된 부분: 버튼을 중앙으로 정렬 */
 }
 
 .saveButton:hover {
-  background-color: #8d8d8d;
+  background-color: #444;
 }
