@@ -1,0 +1,52 @@
+.comment {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 10px 0;
+}
+
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nicknameAndDate {
+  display: flex;
+  align-items: center;
+}
+
+.nickname {
+  font-weight: bold;
+  color: #333;
+  margin-right: 10px; /* 닉네임과 날짜 사이 간격 추가 */
+}
+
+.createdAt {
+  font-size: 12px;
+  color: #999;
+}
+
+.commentContentAndActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content {
+  font-size: 14px;
+  color: #444;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.icon {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.icon:hover {
+  fill: #555;
+}
