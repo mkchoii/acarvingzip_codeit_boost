@@ -52,7 +52,7 @@ function CreateGroupPage() {
     const groupPassword = e.target.groupPassword.value.trim();
 
     // 특수문자 검증: 허용된 특수문자 외에는 경고 메시지 출력
-    const allowedSpecialChars = /^[a-zA-Z0-9!@#$%^_]+$/;
+    const allowedSpecialChars = /^[a-zA-Z0-9\uAC00-\uD7A3!@#$%^_]+$/;
 
     if (!allowedSpecialChars.test(groupName)) {
       setErrorMessage("특수문자는 !@#$%^_ 만 사용하실 수 있습니다.");
