@@ -7,7 +7,7 @@ const imageController = require('./controllers/imageController');
 const commentController = require('./controllers/commentController'); 
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 4000;
 
 // 미들웨어 설정
 app.use(bodyParser.json());
