@@ -61,33 +61,36 @@ groupController.post('/', async (req, res) => {
 
 // 그룹 목록 조회 라우터
 groupController.get('/', async (req, res) => {
-    const { name, sortBy, visibility } = req.query; // 쿼리 파라미터에서 그룹 이름, 정렬 기준, 공개 여부를 받음
+    const { page = 1, pageSize = 10, sortBy = 'mostLiked', keyword = '', isPublic } = req.query; // 쿼리 파라미터 받기
     let sql = 'SELECT * FROM groups';
     const params = [];
     let whereClauseAdded = false; // WHERE 절이 추가되었는지 여부를 체크하는 변수
 
-    // 공개 그룹 또는 비공개 그룹 필터링
-    if (visibility === 'private') {
-        sql += ' WHERE isPublic = 0'; // 비공개 그룹 필터링
-        whereClauseAdded = true; // WHERE 절이 추가되었음을 표시
-    } else {
-        sql += ' WHERE isPublic = 1'; // 공개 그룹 필터링
-        whereClauseAdded = true; // WHERE 절이 추가되었음을 표시
+    // 검색어 필터링 추가
+    if (keyword) {
+        sql += ' WHERE name LIKE ? OR description LIKE ?';
+        params.push(`%${keyword}%`, `%${keyword}%`);
+        whereClauseAdded = true;
     }
 
-    // 그룹 이름으로 검색 기능 추가
-    if (name) {
-        sql += whereClauseAdded ? ' AND name LIKE ?' : ' WHERE name LIKE ?';
-        params.push(`%${name}%`); // 부분 일치 검색을 위한 LIKE 조건
+    // 공개 그룹 또는 비공개 그룹 필터링
+    if (isPublic !== undefined) {
+        sql += whereClauseAdded ? ' AND isPublic = ?' : ' WHERE isPublic = ?';
+        params.push(isPublic === 'true' ? 1 : 0); // boolean 값 변환
     }
 
     // 정렬 기준 설정
     const sortOrder = sortBy === 'latest' ? 'createdAt DESC'
-                    : sortBy === 'postCount' ? '(SELECT COUNT(*) FROM posts WHERE groupId = groups.id) DESC'
-                    : sortBy === 'badgeCount' ? 'badges DESC'
+                    : sortBy === 'mostPosted' ? '(SELECT COUNT(*) FROM posts WHERE groupId = groups.id) DESC'
+                    : sortBy === 'mostBadge' ? 'badges DESC'
                     : 'likes DESC'; // 기본값: 공감순
 
     sql += ` ORDER BY ${sortOrder}`; // 정렬 기준 추가
+
+    // 페이지네이션 설정
+    const offset = (page - 1) * pageSize;
+    sql += ` LIMIT ? OFFSET ?`;
+    params.push(pageSize, offset);
 
     try {
         const rows = await new Promise((resolve, reject) => {
@@ -123,39 +126,30 @@ groupController.get('/', async (req, res) => {
             const diffTime = Math.abs(currentDate - createdAt);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-            if (row.isPublic) {
-                // 공개 그룹의 경우
-                return {
-                    id: row.id, 
-                    name: row.name,
-                    imageUrl: row.imageUrl,
-                    description: row.description,
-                    isPublic: row.isPublic,
-                    dDay: diffDays,
-                    badges: row.badges ? row.badges.split(',').length : 0, // 배지 개수
-                    posts: postCounts[index], 
-                    likes: row.likes 
-                };
-            } else {
-                // 비공개 그룹의 경우
-                return {
-                    id: row.id, 
-                    name: row.name,
-                    isPublic: row.isPublic,
-                    dDay: diffDays,
-                    badges: row.badges ? row.badges.split(',').length : 0, // 배지 개수
-                    posts: postCounts[index], 
-                    likes: row.likes 
-                };
-            }
+            return {
+                id: row.id,
+                name: row.name,
+                imageUrl: row.imageUrl,
+                description: row.description,
+                isPublic: row.isPublic,
+                dDay: diffDays,
+                badges: row.badges ? row.badges.split(',').length : 0, // 배지 개수
+                posts: postCounts[index],
+                likes: row.likes
+            };
         });
-        res.status(200).json(responseRows);
+
+        res.status(200).json({
+            currentPage: parseInt(page),
+            pageSize: parseInt(pageSize),
+            totalCount: rows.length,
+            data: responseRows
+        });
     } catch (err) {
         console.error("그룹 목록 조회 오류:", err.message);
         res.status(500).json({ error: '그룹 목록을 조회하는 데 실패했습니다.' });
     }
 });
-
 
 // 그룹 공감하기 라우터
 groupController.post('/:groupId/like', (req, res) => {
