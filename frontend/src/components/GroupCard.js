@@ -5,7 +5,7 @@ import { ReactComponent as Favicon } from "../assets/favicon_s.svg";
 
 function GroupCard({ group }) {
   const navigate = useNavigate(); // 페이지 이동
-  const isImageAvailable = Boolean(group.image);
+  const isImageAvailable = Boolean(group.imageUrl);
   const isPublic = group.isPublic;
 
   // D+ 형식으로 경과 일수 계산
@@ -42,7 +42,7 @@ function GroupCard({ group }) {
       onClick={handleClick} // 페이지 이동
     >
       {isImageAvailable && isPublic && (
-        <img src={group.image} alt={group.name} className={styles.image} />
+        <img src={group.imageUrl} alt={group.name} className={styles.image} />
       )}
       <div className={styles.content}>
         <div className={styles.header}>
