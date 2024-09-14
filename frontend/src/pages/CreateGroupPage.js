@@ -82,8 +82,10 @@ function CreateGroupPage() {
       });
       setModalOpen(true);
 
-      // 그룹 생성 후 홈 페이지로 리디렉션
-      navigate("/");
+      // 1초 지연 후 홈 페이지로 리디렉션
+      setTimeout(() => {
+        navigate("/");
+      }, 1000); // 1초 지연
     } catch (error) {
       setModalContent({
         title: "그룹 만들기 실패",
