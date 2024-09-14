@@ -75,6 +75,9 @@ function GroupDetailPage() {
         // 실제 그룹 상세 조회 API 호출
         const group = await fetchGroupDetail(groupId);
 
+        // 응답 데이터 확인을 위한 콘솔 로그
+        console.log("Fetched group details:", group);
+
         if (!group) {
           throw new Error("그룹을 찾을 수 없습니다.");
         }
@@ -112,7 +115,14 @@ function GroupDetailPage() {
           isPublic: activeTab === "public",
           groupId,
         });
+
         setFilteredMemories(response.data);
+
+        // 게시글 수 업데이트
+        setGroupDetail((prevDetail) => ({
+          ...prevDetail,
+          postCount: response.data.length,
+        }));
       } catch (err) {
         setError("게시글 목록을 불러오는 중 오류가 발생했습니다.");
       }
@@ -135,12 +145,21 @@ function GroupDetailPage() {
 
   const handleLikeClick = async () => {
     try {
-      await likeGroup(groupId);
+      console.log(`Attempting to like group with ID: ${groupId}`);
+      const response = await likeGroup(groupId);
+      console.log("Group like response:", response); // API 응답을 로그로 출력
+
+      // 서버에서 갱신된 likeCount를 받아 상태 업데이트
       setGroupDetail((prevDetail) => ({
         ...prevDetail,
-        likeCount: Number(prevDetail.likeCount) + 1,
+        likeCount: response.likeCount || prevDetail.likeCount + 1,
       }));
+      console.log("Updated group after like:", {
+        ...groupDetail,
+        likeCount: response.likeCount || groupDetail.likeCount + 1,
+      });
     } catch (error) {
+      console.error("Error liking group:", error);
       alert("공감하기에 실패했습니다.");
     }
   };
