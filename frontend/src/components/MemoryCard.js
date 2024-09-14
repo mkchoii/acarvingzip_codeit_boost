@@ -44,6 +44,11 @@ function MemoryCard({ post, isPublic }) {
     }
   };
 
+  // XXX: 태그 관련 코드 추가하였습니다.
+  const tags = post.tags
+  ? post.tags.split(',').map(tag => tag.trim()) // 공백 제거
+  : [];
+
   return (
     <div className={styles.card} onClick={handleCardClick}>
       {" "}
@@ -61,14 +66,15 @@ function MemoryCard({ post, isPublic }) {
 
         <h3 className={styles.title}>{post.title}</h3>
 
+        {/* XXX: 태그 관련 코드 수정하였습니다. */}
         {/* 공개 카드에서만 태그 표시 */}
         {post.isPublic && post.tags.length > 0 && (
           <div className={styles.tags}>
-            {post.tags.map((tag, index) => (
-              <span key={index} className={styles.tag}>
-                #{tag}
-              </span>
-            ))}
+            {tags.length > 0 ? (
+              <span>{tags.map(tag => `#${tag}`).join(' ')}</span>
+            ) : (
+              <span></span>
+            )}
           </div>
         )}
 
