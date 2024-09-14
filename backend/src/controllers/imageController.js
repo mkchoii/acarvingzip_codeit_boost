@@ -9,7 +9,7 @@ const router = express.Router();
 // 이미지 저장 경로 및 파일명 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../uploads'); // 절대 경로 사용
+    const dir = path.join(__dirname, '../../uploads'); // 절대 경로 사용
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true }); // 폴더가 없으면 생성
     }
