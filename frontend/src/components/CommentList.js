@@ -4,7 +4,7 @@ import CommentModal from "./CommentModal"; // 댓글 수정 모달
 import GroupDeleteModal from "./GroupDeleteModal"; // 삭제 모달
 import { deleteComment, fetchComments, updateComment } from "../api/commentApi"; // 댓글 삭제 및 조회 API 임포트
 
-function CommentSection({ postId }) {
+function CommentSection({ postId, reload, onDeleteComment }) {
   const [comments, setComments] = useState([]); // 댓글 목록
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달 상태
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // 수정 모달 상태
@@ -31,10 +31,10 @@ function CommentSection({ postId }) {
     [postId, pageSize]
   );
 
-  // 페이지가 로드될 때 댓글 목록을 가져옴
+  // 페이지가 로드될 때 및 `reload`가 변경될 때 댓글 목록을 가져옴
   useEffect(() => {
     loadComments();
-  }, [loadComments]); // 의존성 배열에 loadComments 추가
+  }, [loadComments, reload]); // 의존성 배열에 `reload` 추가
 
   // 댓글 삭제 핸들러
   const handleDelete = async (password) => {
@@ -46,6 +46,11 @@ function CommentSection({ postId }) {
       setComments((prevComments) =>
         prevComments.filter((comment) => comment.id !== selectedCommentId)
       );
+
+      // 부모 컴포넌트에 삭제된 댓글을 알림
+      if (onDeleteComment) {
+        onDeleteComment();
+      }
 
       // 모달 닫기
       setIsDeleteModalOpen(false);
