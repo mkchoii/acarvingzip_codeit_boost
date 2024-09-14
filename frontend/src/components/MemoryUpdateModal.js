@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom"; // useParams 추가
 import styles from "./MemoryUpdateModal.module.css";
 import { uploadImage } from "../api/imageApi";
 import { updatePost } from "../api/postApi";
@@ -7,6 +8,7 @@ import { ReactComponent as ToggleActiveIcon } from "../assets/toggle_active.svg"
 import { ReactComponent as ToggleInactiveIcon } from "../assets/toggle_inactive.svg";
 
 function MemoryUpdateModal({ post, onClose, onSave }) {
+  const { postId } = useParams(); // URL에서 postId 가져오기
   const [formData, setFormData] = useState({
     nickname: "",
     title: "",
@@ -32,7 +34,7 @@ function MemoryUpdateModal({ post, onClose, onSave }) {
         title: post.title || "",
         content: post.content || "",
         imageUrl: post.imageUrl || "",
-        tags: post.tags || [],
+        tags: Array.isArray(post.tags) ? post.tags : [],
         location: post.location || "",
         moment: post.moment || "",
         isPublic: post.isPublic || true,
@@ -107,7 +109,7 @@ function MemoryUpdateModal({ post, onClose, onSave }) {
 
     try {
       setLoading(true);
-      const updatedData = await updatePost(post.id, updatedPost);
+      const updatedData = await updatePost(postId, updatedPost); // postId를 URL에서 가져옴
       onSave(updatedData);
       setLoading(false);
       onClose();
@@ -116,6 +118,12 @@ function MemoryUpdateModal({ post, onClose, onSave }) {
       setLoading(false);
     }
   };
+
+  // useEffect를 이용하여 placeholder 설정
+  useEffect(() => {
+    const momentInput = document.getElementById("moment");
+    momentInput.placeholder = "YYYY-MM-DD";
+  }, []);
 
   return (
     <div className={styles.modalOverlay}>
@@ -242,20 +250,20 @@ function MemoryUpdateModal({ post, onClose, onSave }) {
             <div className={styles.formGroup}>
               <label htmlFor="moment">추억의 순간</label>
               <input
-                type="text"
+                type="date"
                 id="moment"
                 name="moment"
                 value={formData.moment}
                 onChange={handleInputChange}
-                placeholder="추억의 순간을 입력해 주세요"
+                pattern="\d{4}-\d{2}-\d{2}"
+                required
               />
             </div>
 
             <div className={styles.formGroup}>
               <label>추억 공개 선택</label>
               <div className={styles.toggleWrapper}>
-                <span className={styles.toggleLabel}>공개</span>{" "}
-                {/* 공개 텍스트 */}
+                <span className={styles.toggleLabel}>공개</span>
                 <div
                   onClick={handleToggleChange}
                   className={styles.toggleButton}

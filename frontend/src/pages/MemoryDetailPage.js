@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getPostDetail, likePost, deletePost } from "../api/postApi"; // 공감, 삭제, 게시글 상세 API 사용
+import { getPostDetail, likePost, deletePost } from "../api/postApi";
 import { ReactComponent as LikeIcon } from "../assets/favicon_s.svg";
 import { ReactComponent as CommentIcon } from "../assets/icon_bubble.svg";
-import { ReactComponent as Logo } from "../assets/logo.svg"; // 로고 추가
-import { ReactComponent as LikeButton } from "../assets/likeButton.svg"; // 공감 보내기 버튼용 SVG
+import { ReactComponent as Logo } from "../assets/logo.svg";
+import { ReactComponent as LikeButton } from "../assets/likeButton.svg";
 import GroupDeleteModal from "../components/GroupDeleteModal";
-import MemoryUpdateModal from "../components/MemoryUpdateModal"; // 수정 모달 임포트
-import CommentModal from "../components/CommentModal"; // 댓글 등록 모달 임포트
-import CommentList from "../components/CommentList"; // 댓글 목록 컴포넌트 추가
+import MemoryUpdateModal from "../components/MemoryUpdateModal";
+import CommentModal from "../components/CommentModal";
+import CommentList from "../components/CommentList";
 import styles from "./MemoryDetailPage.module.css";
 
 function MemoryDetailPage() {
-  const { postId, groupId } = useParams(); // URL에서 postId와 groupId 추출
+  const { postId, groupId } = useParams();
   const [memory, setMemory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false); // 댓글 모달 상태 추가
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMemoryDetail = async () => {
       try {
-        const foundMemory = await getPostDetail(postId); // 실제 API 호출
+        const foundMemory = await getPostDetail(postId);
         setMemory(foundMemory);
         setLoading(false);
       } catch (err) {
@@ -35,28 +35,31 @@ function MemoryDetailPage() {
     fetchMemoryDetail();
   }, [postId]);
 
-  // 공감 보내기 처리 함수
   const handleLike = async () => {
     try {
-      await likePost(postId); // 공감 API 호출
+      await likePost(postId);
       setMemory((prevMemory) => ({
         ...prevMemory,
-        likeCount: prevMemory.likeCount + 1, // 공감 수 업데이트
+        likeCount: prevMemory.likeCount + 1,
       }));
     } catch (error) {
       console.error("Error liking post:", error);
     }
   };
 
-  // 게시글 삭제 처리 함수
   const handleDelete = async (password) => {
     try {
-      await deletePost(postId, password); // 삭제 API 호출
+      await deletePost(postId, password);
       alert("게시글이 성공적으로 삭제되었습니다.");
-      navigate(`/group/${groupId}`); // 삭제 후 그룹 상세 페이지로 리다이렉트
+      navigate(`/group/${groupId}`);
     } catch (error) {
       alert(error.message);
     }
+  };
+
+  const handleUpdateSuccess = (updatedData) => {
+    setMemory(updatedData);
+    setIsUpdateModalOpen(false);
   };
 
   if (loading) return <div className={styles.loading}>로딩 중...</div>;
@@ -77,13 +80,13 @@ function MemoryDetailPage() {
         <div className={styles.managementButtons}>
           <button
             className={styles.textButton}
-            onClick={() => setIsUpdateModalOpen(true)} // 수정 모달 열기
+            onClick={() => setIsUpdateModalOpen(true)}
           >
             추억 수정하기
           </button>
           <button
             className={styles.textButton}
-            onClick={() => setIsDeleteModalOpen(true)} // 삭제 모달 열기
+            onClick={() => setIsDeleteModalOpen(true)}
           >
             추억 삭제하기
           </button>
@@ -91,7 +94,12 @@ function MemoryDetailPage() {
       </div>
       <h1 className={styles.title}>{memory.title}</h1>
       <div className={styles.tags}>
-        {memory.tags.map((tag, index) => (
+        {(Array.isArray(memory.tags)
+          ? memory.tags
+          : memory.tags
+          ? memory.tags.split(",")
+          : []
+        ).map((tag, index) => (
           <span key={index}>#{tag} </span>
         ))}
       </div>
@@ -108,7 +116,7 @@ function MemoryDetailPage() {
           <LikeButton className={styles.likeButton} onClick={handleLike} />
         </div>
       </div>
-      <div className={styles.separator}></div> {/* 회색 선 추가 */}
+      <div className={styles.separator}></div>
       <div className={styles.content}>
         <img
           src={memory.imageUrl}
@@ -119,7 +127,7 @@ function MemoryDetailPage() {
       </div>
       <button
         className={styles.commentButton}
-        onClick={() => setIsCommentModalOpen(true)} // 댓글 모달 열기
+        onClick={() => setIsCommentModalOpen(true)}
       >
         댓글 등록하기
       </button>
@@ -129,36 +137,29 @@ function MemoryDetailPage() {
           <span>{memory.commentCount}</span>
         </h2>
         <div className={styles.commentSeparator}></div>
-        {/* CommentList 추가 */}
         <CommentList postId={postId} />
       </div>
       {isDeleteModalOpen && (
         <GroupDeleteModal
           title="추억 삭제"
-          onClose={() => setIsDeleteModalOpen(false)} // 모달 닫기
-          onDelete={handleDelete} // 삭제 처리 함수 연결
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleDelete}
         />
       )}
       {isUpdateModalOpen && (
         <MemoryUpdateModal
-          postId={postId}
-          initialData={memory} // 게시글 데이터를 모달로 전달
-          onClose={() => setIsUpdateModalOpen(false)} // 모달 닫기
-          onSuccess={() => {
-            alert("게시글이 성공적으로 수정되었습니다.");
-            window.location.reload(); // 페이지 새로고침
-          }}
+          onClose={() => setIsUpdateModalOpen(false)}
+          onSave={handleUpdateSuccess}
         />
       )}
       {isCommentModalOpen && (
         <CommentModal
           postId={postId}
-          onClose={() => setIsCommentModalOpen(false)} // 모달 닫기
+          onClose={() => setIsCommentModalOpen(false)}
           onAddComment={(newComment) => {
-            // 새 댓글을 처리
             setMemory((prevMemory) => ({
               ...prevMemory,
-              commentCount: prevMemory.commentCount + 1, // 댓글 수 업데이트
+              commentCount: prevMemory.commentCount + 1,
             }));
           }}
         />
