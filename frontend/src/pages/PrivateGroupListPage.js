@@ -24,12 +24,14 @@ function reducer(state, action) {
         error: false,
       };
     case "FETCH_SUCCESS":
-      const newGroups = [...state.groups, ...action.payload];
       return {
         ...state,
         loading: false,
-        groups: newGroups,
-        displayedGroups: newGroups.slice(0, state.page * state.itemsPerPage),
+        groups: action.payload, // 이전 데이터를 유지하지 않고 새로운 데이터로만 상태를 업데이트
+        displayedGroups: action.payload.slice(
+          0,
+          state.page * state.itemsPerPage
+        ),
         allItemsLoaded: action.payload.length < state.itemsPerPage,
       };
     case "LOAD_MORE":

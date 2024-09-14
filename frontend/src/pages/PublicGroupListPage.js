@@ -24,7 +24,10 @@ function reducer(state, action) {
         error: false,
       };
     case "FETCH_SUCCESS":
-      const newGroups = [...state.groups, ...action.payload];
+      const isLoadMore = state.page > 1; // 현재 페이지가 1보다 큰 경우 "더보기"를 한 것
+      const newGroups = isLoadMore
+        ? [...state.groups, ...action.payload]
+        : action.payload; // "더보기" 시에는 데이터 누적
       return {
         ...state,
         loading: false,
@@ -32,6 +35,7 @@ function reducer(state, action) {
         displayedGroups: newGroups.slice(0, state.page * state.itemsPerPage),
         allItemsLoaded: action.payload.length < state.itemsPerPage,
       };
+
     case "LOAD_MORE":
       const moreItems = state.groups.slice(0, state.page * state.itemsPerPage);
       return {
