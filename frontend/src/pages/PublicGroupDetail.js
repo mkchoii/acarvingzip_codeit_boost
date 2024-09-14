@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MemoryCard from "../components/MemoryCard";
 import styles from "./PublicGroupDetail.module.css";
 import noPostsImage from "../assets/emptyMemory.svg";
 
-function PublicGroupDetail({ memories, selectedFilter }) {
+function PublicGroupDetail({ memories, selectedFilter, groupId }) {
   const [visibleMemories, setVisibleMemories] = useState(8);
   const [filteredMemories, setFilteredMemories] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const filterMemories = () => {
@@ -27,6 +29,11 @@ function PublicGroupDetail({ memories, selectedFilter }) {
 
   const handleLoadMore = () => {
     setVisibleMemories((prev) => prev + 8);
+  };
+
+  // 추억 올리기 버튼 클릭 핸들러
+  const handleUploadClick = () => {
+    navigate(`/group/${groupId}/upload-memory`); // groupId 포함한 경로로 이동
   };
 
   return (
@@ -51,7 +58,9 @@ function PublicGroupDetail({ memories, selectedFilter }) {
         ) : (
           <div className={styles.noPosts}>
             <img src={noPostsImage} alt="No posts" />
-            <button className={styles.uploadButton}>추억 올리기</button>
+            <button className={styles.uploadButton} onClick={handleUploadClick}>
+              추억 올리기
+            </button>
           </div>
         )}
       </div>

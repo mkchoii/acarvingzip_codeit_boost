@@ -89,6 +89,7 @@
 
 .formGroup input[type="text"],
 .formGroup input[type="password"],
+.formGroup input[type="date"], /* 날짜 입력 필드 스타일 추가 */
 .formGroup textarea {
   width: 100%;
   max-width: 400px;

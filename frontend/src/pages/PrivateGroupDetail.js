@@ -35,6 +35,11 @@ function PrivateGroupDetail({ group, memories, selectedFilter }) {
     navigate(`/post/${postId}/access`);
   };
 
+  // 추억 올리기 버튼 클릭 핸들러
+  const handleUploadClick = () => {
+    navigate(`/group/${group.id}/upload-memory`); // groupId를 사용하여 이동
+  };
+
   return (
     <div className={styles.groupDetail}>
       <div className={styles.posts}>
@@ -62,7 +67,9 @@ function PrivateGroupDetail({ group, memories, selectedFilter }) {
         ) : (
           <div className={styles.noPosts}>
             <img src={noPostsImage} alt="No posts" />
-            <button className={styles.uploadButton}>추억 올리기</button>
+            <button className={styles.uploadButton} onClick={handleUploadClick}>
+              추억 올리기
+            </button>
           </div>
         )}
       </div>
