@@ -19,6 +19,7 @@ function MemoryDetailPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+  const [reloadComments, setReloadComments] = useState(false); // reloadComments 상태 추가
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,6 +61,24 @@ function MemoryDetailPage() {
   const handleUpdateSuccess = (updatedData) => {
     setMemory(updatedData);
     setIsUpdateModalOpen(false);
+  };
+
+  // 댓글 추가 후 목록 재로드 핸들러
+  const handleAddComment = () => {
+    setMemory((prevMemory) => ({
+      ...prevMemory,
+      commentCount: prevMemory.commentCount + 1,
+    }));
+    setReloadComments((prev) => !prev); // reloadComments 상태 변경
+  };
+
+  // 댓글 삭제 후 목록 재로드 핸들러
+  const handleDeleteComment = () => {
+    setMemory((prevMemory) => ({
+      ...prevMemory,
+      commentCount: prevMemory.commentCount - 1,
+    }));
+    setReloadComments(!reloadComments); // reloadComments 상태 변경
   };
 
   if (loading) return <div className={styles.loading}>로딩 중...</div>;
@@ -137,7 +156,11 @@ function MemoryDetailPage() {
           <span>{memory.commentCount}</span>
         </h2>
         <div className={styles.commentSeparator}></div>
-        <CommentList postId={postId} />
+        <CommentList
+          postId={postId}
+          reload={reloadComments}
+          onDeleteComment={handleDeleteComment}
+        />
       </div>
       {isDeleteModalOpen && (
         <GroupDeleteModal
@@ -156,12 +179,7 @@ function MemoryDetailPage() {
         <CommentModal
           postId={postId}
           onClose={() => setIsCommentModalOpen(false)}
-          onAddComment={(newComment) => {
-            setMemory((prevMemory) => ({
-              ...prevMemory,
-              commentCount: prevMemory.commentCount + 1,
-            }));
-          }}
+          onAddComment={handleAddComment}
         />
       )}
     </div>
