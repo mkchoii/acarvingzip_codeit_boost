@@ -28,8 +28,9 @@
   padding-right: 20px;
 }
 
-form {
-  width: 800px !important;
+.memoryUploadForm {
+  max-width: 800px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;

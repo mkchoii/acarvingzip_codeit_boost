@@ -24,7 +24,6 @@ function MemoryUploadPage() {
   });
 
   const [tagInput, setTagInput] = useState("");
-  const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const [submitError, setSubmitError] = useState(null);
 
@@ -44,7 +43,6 @@ function MemoryUploadPage() {
     const file = e.target.files[0];
     if (!file) return;
 
-    setUploading(true);
     setUploadError(null);
 
     try {
@@ -53,11 +51,9 @@ function MemoryUploadPage() {
         ...prevData,
         imageUrl,
       }));
-      setUploading(false);
     } catch (error) {
       console.error("Image upload failed:", error);
       setUploadError("이미지 업로드에 실패했습니다. 다시 시도해 주세요.");
-      setUploading(false);
     }
   };
 
@@ -122,7 +118,11 @@ function MemoryUploadPage() {
         <Logo className={styles.logo} onClick={handleLogoClick} />
         <h1 className={styles.title}>추억 올리기</h1>
       </div>
-      <form onSubmit={handleSubmit} className={styles.form} noValidate>
+      <form
+        onSubmit={handleSubmit}
+        className={styles.memoryUploadForm}
+        noValidate
+      >
         <div className={styles.formColumns}>
           <div className={styles.leftColumn}>
             <div className={styles.formGroup}>
