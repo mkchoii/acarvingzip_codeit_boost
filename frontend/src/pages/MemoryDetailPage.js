@@ -81,6 +81,11 @@ function MemoryDetailPage() {
     setReloadComments(!reloadComments); // reloadComments 상태 변경
   };
 
+  // 댓글 수정 후 목록 재로드 핸들러
+  const handleEditComment = () => {
+    setReloadComments((prev) => !prev); // reloadComments 상태 변경
+  };
+
   if (loading) return <div className={styles.loading}>로딩 중...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
 
@@ -160,6 +165,7 @@ function MemoryDetailPage() {
           postId={postId}
           reload={reloadComments}
           onDeleteComment={handleDeleteComment}
+          onEditComment={handleEditComment}
         />
       </div>
       {isDeleteModalOpen && (

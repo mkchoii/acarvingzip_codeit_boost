@@ -4,7 +4,7 @@ import CommentModal from "./CommentModal"; // 댓글 수정 모달
 import GroupDeleteModal from "./GroupDeleteModal"; // 삭제 모달
 import { deleteComment, fetchComments, updateComment } from "../api/commentApi"; // 댓글 삭제 및 조회 API 임포트
 
-function CommentSection({ postId, reload, onDeleteComment }) {
+function CommentSection({ postId, reload, onDeleteComment, onEditComment }) {
   const [comments, setComments] = useState([]); // 댓글 목록
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달 상태
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // 수정 모달 상태
@@ -63,21 +63,31 @@ function CommentSection({ postId, reload, onDeleteComment }) {
   const handleEdit = async (nickname, content, password) => {
     try {
       // 댓글 수정 API 호출
-      await updateComment(selectedCommentId, { nickname, content, password });
+      const updatedComment = await updateComment(selectedCommentId, {
+        nickname,
+        content,
+        password,
+      });
 
       // 수정된 댓글을 목록에서 업데이트
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment.id === selectedCommentId
-            ? { ...comment, nickname, content }
-            : comment
-        )
-      );
+      if (updatedComment && updatedComment.id) {
+        setComments((prevComments) =>
+          prevComments.map((comment) =>
+            comment.id === selectedCommentId
+              ? {
+                  ...comment,
+                  nickname: updatedComment.nickname,
+                  content: updatedComment.content,
+                }
+              : comment
+          )
+        );
 
-      // 수정 모달 닫기
-      setIsEditModalOpen(false);
+        // 수정 모달 닫기
+        setIsEditModalOpen(false);
+      }
     } catch (error) {
-      alert("댓글 수정에 실패했습니다. 비밀번호를 확인하세요.");
+      console.error("댓글 수정 오류:", error);
     }
   };
 
@@ -102,6 +112,8 @@ function CommentSection({ postId, reload, onDeleteComment }) {
   if (error) {
     return <div>{error}</div>;
   }
+
+  console.error("댓글 수정 오류:", error);
 
   return (
     <div>

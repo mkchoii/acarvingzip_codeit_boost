@@ -26,23 +26,35 @@ function CommentModal({
     try {
       if (isEditing) {
         // 댓글 수정 API 호출
-        const updatedComment = { nickname, content: comment, password };
-        await updateComment(initialData.id, updatedComment); // 댓글 수정 API
-        onAddComment(updatedComment); // 수정된 댓글을 부모 컴포넌트로 전달
+        const updatedComment = await updateComment(initialData.id, {
+          nickname,
+          content: comment,
+          password,
+        });
+
+        // 수정된 댓글을 부모 컴포넌트로 전달
+        onAddComment(updatedComment);
       } else {
         // 댓글 등록 API 호출
         const newComment = { nickname, content: comment, password };
-        const response = await registerComment(postId, newComment); // 댓글 등록 API
-        onAddComment(response); // 성공 시 부모 컴포넌트로 댓글 정보 전달
+        const response = await registerComment(postId, newComment);
+
+        // 성공 시 부모 컴포넌트로 댓글 정보 전달
+        onAddComment(response);
       }
 
       // 폼 초기화 및 모달 닫기
       setNickname("");
       setComment("");
       setPassword("");
+      setError(""); // 오류 메시지 초기화
       onClose();
     } catch (err) {
-      setError(err.message || "처리에 실패했습니다.");
+      if (err.message.includes("비밀번호")) {
+        setError("비밀번호를 확인하세요.");
+      } else {
+        setError("처리에 실패했습니다.");
+      }
     }
   };
 
