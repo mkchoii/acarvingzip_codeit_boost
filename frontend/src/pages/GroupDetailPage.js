@@ -36,8 +36,15 @@ function GroupDetailPage() {
     navigate("/");
   };
 
+  // XXX: 디데이 기본값 수정했습니다.
   const calculateDday = (createdAt) => {
+    if (!createdAt) {
+      return "D+0"; // createdAt이 없을 경우 기본값 반환
+    }
     const createdDate = new Date(createdAt);
+    if (isNaN(createdDate)) {
+      return "Invalid Date"; // 날짜가 유효하지 않을 경우 대체 값 반환
+    }
     const today = new Date();
     const diffTime = Math.abs(today - createdDate);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
