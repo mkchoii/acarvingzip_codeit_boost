@@ -27,7 +27,8 @@
 }
 
 .cardPrivate {
-  height: 150px; /* 비공개 그룹 카드의 고정된 높이 */
+  min-height: 150px; /* 비공개 최소 높이 */
+  height: auto;
 }
 
 .image {

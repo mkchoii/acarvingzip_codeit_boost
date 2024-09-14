@@ -36,14 +36,14 @@ function GroupDetailPage() {
     navigate("/");
   };
 
-  // XXX: 디데이 기본값 수정했습니다.
+  // 디데이 계산
   const calculateDday = (createdAt) => {
     if (!createdAt) {
-      return "D+0"; // createdAt이 없을 경우 기본값 반환
+      return "D+0";
     }
     const createdDate = new Date(createdAt);
     if (isNaN(createdDate)) {
-      return "Invalid Date"; // 날짜가 유효하지 않을 경우 대체 값 반환
+      return "Invalid Date";
     }
     const today = new Date();
     const diffTime = Math.abs(today - createdDate);
@@ -54,7 +54,7 @@ function GroupDetailPage() {
   // 게시글이 7일 연속으로 작성되었는지 확인하는 함수
   const checkConsecutivePosts = (posts) => {
     const dates = posts.map((post) => new Date(post.createdAt));
-    dates.sort((a, b) => a - b); // 날짜 순으로 정렬
+    dates.sort((a, b) => a - b);
 
     let consecutiveCount = 1;
     for (let i = 1; i < dates.length; i++) {
@@ -63,7 +63,7 @@ function GroupDetailPage() {
         consecutiveCount++;
         if (consecutiveCount >= 7) return true;
       } else {
-        consecutiveCount = 1; // 연속되지 않으면 카운트 리셋
+        consecutiveCount = 1;
       }
     }
     return false;
@@ -78,6 +78,14 @@ function GroupDetailPage() {
         if (!group) {
           throw new Error("그룹을 찾을 수 없습니다.");
         }
+
+        // `isPublic`을 Boolean으로 변환
+        group.isPublic = Boolean(group.isPublic);
+
+        // `likeCount`, `postCount`, `postLikeCount` 초기화
+        group.likeCount = Number(group.likeCount) || 0;
+        group.postCount = Number(group.postCount) || 0;
+        group.postLikeCount = Number(group.postLikeCount) || 0;
 
         group.days = calculateDday(group.createdAt);
         setGroupDetail(group);
@@ -130,7 +138,7 @@ function GroupDetailPage() {
       await likeGroup(groupId);
       setGroupDetail((prevDetail) => ({
         ...prevDetail,
-        likeCount: prevDetail.likeCount + 1,
+        likeCount: Number(prevDetail.likeCount) + 1,
       }));
     } catch (error) {
       alert("공감하기에 실패했습니다.");
@@ -218,7 +226,6 @@ function GroupDetailPage() {
             <div className={styles.badgesSection}>
               <div className={styles.badgesTitle}>획득 배지</div>
               <div className={styles.badges}>
-                {/* 그룹 공감 배지 - 공감 수가 1만 이상일 때 */}
                 {groupDetail.likeCount >= 10000 && (
                   <img
                     src={GroupLikeBadge}
@@ -227,7 +234,6 @@ function GroupDetailPage() {
                   />
                 )}
 
-                {/* 7일 연속 게시글 등록 배지 */}
                 {checkConsecutivePosts(filteredMemories) && (
                   <img
                     src={PostBadge}
@@ -236,7 +242,6 @@ function GroupDetailPage() {
                   />
                 )}
 
-                {/* 게시글 공감 배지 - 게시글 공감 수가 1만 이상일 때 */}
                 {groupDetail.postLikeCount >= 10000 && (
                   <img
                     src={PostLikeBadge}
@@ -273,7 +278,7 @@ function GroupDetailPage() {
             sortOptions={[
               { label: "공감순", value: "mostLiked" },
               { label: "최신순", value: "latest" },
-              { label: "댓글순", value: "mostCommented" }, // 댓글순 추가
+              { label: "댓글순", value: "mostCommented" },
             ]}
           />
         </div>
@@ -292,7 +297,6 @@ function GroupDetailPage() {
         )}
       </div>
 
-      {/* 수정 및 삭제 모달 */}
       {isUpdateModalOpen && (
         <GroupUpdateModal
           group={groupDetail}

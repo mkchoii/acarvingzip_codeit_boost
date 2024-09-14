@@ -6,11 +6,10 @@ import { ReactComponent as Favicon } from "../assets/favicon_s.svg";
 function GroupCard({ group }) {
   const navigate = useNavigate(); // 페이지 이동
   const isImageAvailable = Boolean(group.imageUrl);
-  const isPublic = group.isPublic;
+  const isPublic = Boolean(group.isPublic); // isPublic을 boolean으로 변환
 
   // D+ 형식으로 경과 일수 계산
   const calculateDday = (createdAt) => {
-    // createdAt이 유효한지 확인
     if (!createdAt) {
       return "D+0"; // createdAt이 없을 경우 기본값 반환
     }
@@ -46,18 +45,14 @@ function GroupCard({ group }) {
   };
 
   return (
-    <div
-      className={`${styles.card} ${cardClassName}`}
-      onClick={handleClick} // 페이지 이동
-    >
+    <div className={`${styles.card} ${cardClassName}`} onClick={handleClick}>
       {isImageAvailable && isPublic && (
         <img src={group.imageUrl} alt={group.name} className={styles.image} />
       )}
       <div className={styles.content}>
         <div className={styles.header}>
-          <span className={styles.days}>{calculateDday(group.createdAt)}</span>{" "}
-          {/* D+디데이 */}
-          <span>{group.isPublic ? "공개" : "비공개"}</span>
+          <span className={styles.days}>{calculateDday(group.createdAt)}</span>
+          <span>{isPublic ? "공개" : "비공개"}</span>
         </div>
         <h2 className={styles.title}>{group.name}</h2>
         {isPublic && group.introduction && (
@@ -66,17 +61,19 @@ function GroupCard({ group }) {
         <div className={styles.footer}>
           <div className={styles.footerSection}>
             <span className={styles.label}>획득 배지</span>
-            {/* badgeCount로 배지 개수만 표시 */}
-            <span className={styles.data}>{group.badgeCount}</span>
+            {/* badgeCount가 없을 경우 0으로 표시 */}
+            <span className={styles.data}>{group.badgeCount ?? 0}</span>
           </div>
           <div className={styles.footerSection}>
             <span className={styles.label}>게시물</span>
-            <span className={styles.data}>{group.postCount}</span>
+            {/* postCount가 없을 경우 0으로 표시 */}
+            <span className={styles.data}>{group.postCount ?? 0}</span>
           </div>
           <div className={styles.likesSection}>
             <span className={styles.label}>그룹 공감</span>
+            {/* likeCount가 없을 경우 0으로 표시 */}
             <span className={styles.data}>
-              <Favicon className={styles.favicon} /> {group.likeCount}
+              <Favicon className={styles.favicon} /> {group.likeCount ?? 0}
             </span>
           </div>
         </div>
