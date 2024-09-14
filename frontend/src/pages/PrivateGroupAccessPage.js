@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PrivateGroupAccessPage.module.css";
 import { ReactComponent as Logo } from "../assets/logo.svg";
 import { checkPrivateGroupAccess } from "../api/groupApi";
 import Modal from "../components/Modal"; // 모달 컴포넌트 임포트
 
-function PrivateGroupAccessPage({ groupId }) {
+function PrivateGroupAccessPage() {
+  const { groupId } = useParams(); // URL에서 groupId를 추출
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 추가
@@ -21,12 +22,19 @@ function PrivateGroupAccessPage({ groupId }) {
 
     try {
       const response = await checkPrivateGroupAccess(groupId, password);
-      if (response.message === "비밀번호가 확인되었습니다") {
+      console.log("API Response:", response); // 응답 내용을 확인
+
+      // 응답 메시지 처리 개선
+      if (response.message && response.message.includes("확인되었습니다")) {
         navigate(`/group/${groupId}`);
+      } else {
+        setError("비밀번호가 틀렸습니다.");
+        setIsModalOpen(true);
       }
     } catch (err) {
+      console.error("Error:", err);
       setError("비밀번호가 틀렸습니다.");
-      setIsModalOpen(true); // 비밀번호가 틀리면 모달을 표시
+      setIsModalOpen(true);
     }
   };
 
