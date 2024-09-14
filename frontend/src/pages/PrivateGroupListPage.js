@@ -92,6 +92,9 @@ function PrivateGroupListPage({
           );
         }
 
+        // 비공개 그룹만 필터링 (중복 방지)
+        fetchedGroups = fetchedGroups.filter((group) => !group.isPublic);
+
         // 필터에 따른 정렬
         const sortBy = {
           mostLiked: (a, b) => b.likeCount - a.likeCount,
