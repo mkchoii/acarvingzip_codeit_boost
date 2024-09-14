@@ -9,14 +9,15 @@ const router = express.Router();
 // 이미지 저장 경로 및 파일명 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = 'uploads/'; // 이미지를 저장할 폴더
+    const dir = path.join(__dirname, '../uploads'); // 절대 경로 사용
     if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir); // 폴더가 없으면 생성
+      fs.mkdirSync(dir, { recursive: true }); // 폴더가 없으면 생성
     }
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    cb(null, file.fieldname + '-' + Date.now());
+    const ext = path.extname(file.originalname); // 확장자 추출
+    cb(null, file.fieldname + '-' + Date.now() + ext); // 확장자 포함
   },
 });
 

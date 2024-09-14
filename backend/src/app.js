@@ -20,6 +20,7 @@ app.use('/api/groups', postController);
 app.use('/api/posts', postController); 
 app.use('/api/posts', commentController);
 app.use('/api/comments', commentController);
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', (req, res) => {
     res.send('그룹 관리 서버가 실행 중입니다.');
