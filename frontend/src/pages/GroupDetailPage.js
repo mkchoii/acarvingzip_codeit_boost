@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import { ReactComponent as Logo } from "../assets/logo.svg";
 import { ReactComponent as LikeButtonIcon } from "../assets/likeButton.svg";
@@ -21,6 +21,7 @@ import { fetchPostList } from "../api/postApi"; // 실제 게시글 목록 조�
 
 function GroupDetailPage() {
   const { groupId } = useParams();
+  const location = useLocation();
   const [groupDetail, setGroupDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -99,8 +100,14 @@ function GroupDetailPage() {
       }
     };
 
+    // 삭제 후 리로드를 처리하기 위해 location.state.reload를 확인
+    if (location.state?.reload) {
+      setLoading(true);
+      setError(null);
+    }
+
     loadGroupDetail();
-  }, [groupId]);
+  }, [groupId, location.state?.reload]);
 
   useEffect(() => {
     const loadPostList = async () => {
@@ -109,7 +116,7 @@ function GroupDetailPage() {
       try {
         const response = await fetchPostList({
           page: 1,
-          pageSize: 8,
+          pageSize: 1000,
           sortBy: selectedFilter,
           keyword: searchTerm,
           isPublic: activeTab === "public",
