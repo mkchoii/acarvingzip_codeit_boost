@@ -44,6 +44,9 @@ function GroupCard({ group }) {
     }
   };
 
+  // API 데이터 확인
+  console.log("GroupCard data:", group);
+
   return (
     <div className={`${styles.card} ${cardClassName}`} onClick={handleClick}>
       {isImageAvailable && isPublic && (
