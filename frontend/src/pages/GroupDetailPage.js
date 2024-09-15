@@ -203,7 +203,7 @@ function GroupDetailPage() {
       <div className={styles.description}>
         <div className={styles.groupImageWrapper}>
           <img
-            src={groupDetail.image}
+            src={groupDetail.imageUrl}
             alt={groupDetail.name}
             className={styles.groupImage}
           />
