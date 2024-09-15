@@ -149,15 +149,15 @@ function GroupDetailPage() {
       const response = await likeGroup(groupId);
       console.log("Group like response:", response); // API 응답을 로그로 출력
 
-      // 서버에서 갱신된 likeCount를 받아 상태 업데이트
+      if (!response || response.likeCount === undefined) {
+        throw new Error("Failed to update like count.");
+      }
+
+      // 서버에서 갱신된 likeCount로 상태 업데이트
       setGroupDetail((prevDetail) => ({
         ...prevDetail,
-        likeCount: response.likeCount || prevDetail.likeCount + 1,
+        likeCount: response.likeCount,
       }));
-      console.log("Updated group after like:", {
-        ...groupDetail,
-        likeCount: response.likeCount || groupDetail.likeCount + 1,
-      });
     } catch (error) {
       console.error("Error liking group:", error);
       alert("공감하기에 실패했습니다.");

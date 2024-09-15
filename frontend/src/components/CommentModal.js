@@ -7,6 +7,7 @@ function CommentModal({
   postId,
   onClose,
   onAddComment,
+  onEditComment,
   isEditing = false,
   initialData = {},
 }) {
@@ -33,7 +34,7 @@ function CommentModal({
         });
 
         // 수정된 댓글을 부모 컴포넌트로 전달
-        onAddComment(updatedComment);
+        onEditComment(updatedComment);
       } else {
         // 댓글 등록 API 호출
         const newComment = { nickname, content: comment, password };
@@ -47,14 +48,11 @@ function CommentModal({
       setNickname("");
       setComment("");
       setPassword("");
-      setError(""); // 오류 메시지 초기화
+      setError("");
       onClose();
     } catch (err) {
-      if (err.message.includes("비밀번호")) {
-        setError("비밀번호를 확인하세요.");
-      } else {
-        setError("처리에 실패했습니다.");
-      }
+      console.error("댓글 수정 오류:", err.message);
+      setError("처리에 실패했습니다.");
     }
   };
 

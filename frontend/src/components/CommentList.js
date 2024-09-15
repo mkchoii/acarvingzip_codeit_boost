@@ -21,7 +21,11 @@ function CommentSection({ postId, reload, onDeleteComment, onEditComment }) {
       setError(null);
       try {
         const response = await fetchComments(postId, page, pageSize);
-        setComments(response.data);
+        setComments(
+          response.data.sort(
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          )
+        );
         setLoading(false);
       } catch (err) {
         setError("댓글을 불러오는 중 오류가 발생했습니다.");
@@ -39,7 +43,6 @@ function CommentSection({ postId, reload, onDeleteComment, onEditComment }) {
   // 댓글 삭제 핸들러
   const handleDelete = async (password) => {
     try {
-      // 댓글 삭제 API 호출
       await deleteComment(selectedCommentId, password);
 
       // 삭제 성공 시, 댓글 목록에서 해당 댓글 제거
@@ -47,12 +50,10 @@ function CommentSection({ postId, reload, onDeleteComment, onEditComment }) {
         prevComments.filter((comment) => comment.id !== selectedCommentId)
       );
 
-      // 부모 컴포넌트에 삭제된 댓글을 알림
       if (onDeleteComment) {
         onDeleteComment();
       }
 
-      // 모달 닫기
       setIsDeleteModalOpen(false);
     } catch (error) {
       alert("댓글 삭제에 실패했습니다. 비밀번호를 확인하세요.");
@@ -60,35 +61,39 @@ function CommentSection({ postId, reload, onDeleteComment, onEditComment }) {
   };
 
   // 댓글 수정 핸들러
-  const handleEdit = async (nickname, content, password) => {
+  const handleEdit = async (updatedComment) => {
     try {
       // 댓글 수정 API 호출
-      const updatedComment = await updateComment(selectedCommentId, {
-        nickname,
-        content,
-        password,
+      const response = await updateComment(updatedComment.id, {
+        nickname: updatedComment.nickname,
+        content: updatedComment.content,
+        password: updatedComment.password,
       });
 
-      // 수정된 댓글을 목록에서 업데이트
-      if (updatedComment && updatedComment.id) {
-        setComments((prevComments) =>
-          prevComments.map((comment) =>
-            comment.id === selectedCommentId
-              ? {
-                  ...comment,
-                  nickname: updatedComment.nickname,
-                  content: updatedComment.content,
-                }
-              : comment
-          )
-        );
+      // 서버로부터 받은 업데이트된 댓글을 목록에서 반영
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === response.id ? response : comment
+        )
+      );
 
-        // 수정 모달 닫기
-        setIsEditModalOpen(false);
+      if (onEditComment) {
+        onEditComment();
       }
+
+      setIsEditModalOpen(false);
     } catch (error) {
-      console.error("댓글 수정 오류:", error);
+      console.error("댓글 수정 오류:", error); // 오류 메시지 출력
     }
+  };
+
+  // 댓글 추가 핸들러
+  const handleAdd = (newComment) => {
+    setComments((prevComments) =>
+      [...prevComments, newComment].sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      )
+    );
   };
 
   // 댓글 삭제 아이콘 클릭 시 모달 열기
@@ -113,8 +118,6 @@ function CommentSection({ postId, reload, onDeleteComment, onEditComment }) {
     return <div>{error}</div>;
   }
 
-  console.error("댓글 수정 오류:", error);
-
   return (
     <div>
       {comments.length > 0 ? (
@@ -136,20 +139,21 @@ function CommentSection({ postId, reload, onDeleteComment, onEditComment }) {
       {/* 삭제 모달 */}
       {isDeleteModalOpen && (
         <GroupDeleteModal
-          title="댓글 삭제" // 모달 제목
-          onClose={() => setIsDeleteModalOpen(false)} // 모달 닫기 핸들러
-          onDelete={handleDelete} // 댓글 삭제 API 호출 핸들러
+          title="댓글 삭제"
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleDelete}
         />
       )}
 
-      {/* 수정 모달 */}
+      {/* 수정 및 추가 모달 */}
       {isEditModalOpen && (
         <CommentModal
           postId={postId}
-          onClose={() => setIsEditModalOpen(false)} // 모달 닫기 핸들러
-          onAddComment={handleEdit} // 댓글 수정 API 호출 핸들러
-          isEditing={true} // 수정 모드
-          initialData={editingComment} // 수정할 댓글 데이터 전달
+          onClose={() => setIsEditModalOpen(false)}
+          onAddComment={handleAdd} // 새로운 댓글 추가 핸들러
+          onEditComment={handleEdit} // 댓글 수정 핸들러
+          isEditing={true}
+          initialData={editingComment}
         />
       )}
     </div>
