@@ -12,7 +12,7 @@ import CommentList from "../components/CommentList";
 import styles from "./MemoryDetailPage.module.css";
 
 function MemoryDetailPage() {
-  const { postId, groupId } = useParams();
+  const { postId } = useParams();
   const [memory, setMemory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,8 +52,11 @@ function MemoryDetailPage() {
     try {
       await deletePost(postId, password);
       alert("게시글이 성공적으로 삭제되었습니다.");
-      navigate(`/group/${groupId}`);
+
+      // groupId를 제대로 전달하여 GroupDetailPage로 이동
+      navigate(`/group/${memory.groupId}`, { state: { reload: true } });
     } catch (error) {
+      console.error("Error deleting post:", error);
       alert(error.message);
     }
   };
