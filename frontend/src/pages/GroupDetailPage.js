@@ -153,21 +153,18 @@ function GroupDetailPage() {
   const handleLikeClick = async () => {
     try {
       console.log(`Attempting to like group with ID: ${groupId}`);
-      const response = await likeGroup(groupId);
-      console.log("Group like response:", response); // API 응답을 로그로 출력
+      await likeGroup(groupId);
+      console.log("Like action completed");
 
-      if (!response || response.likeCount === undefined) {
-        throw new Error("Failed to update like count.");
-      }
-
-      // 서버에서 갱신된 likeCount로 상태 업데이트
+      // 그룹 상세 정보를 다시 가져와 공감수를 갱신
+      const updatedGroupDetail = await fetchGroupDetail(groupId);
       setGroupDetail((prevDetail) => ({
         ...prevDetail,
-        likeCount: response.likeCount,
+        likeCount: updatedGroupDetail.likeCount,
       }));
     } catch (error) {
       console.error("Error liking group:", error);
-      alert("공감하기에 실패했습니다.");
+      // 사용자에게 알림을 띄우지 않음
     }
   };
 
