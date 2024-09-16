@@ -54,20 +54,36 @@ function GroupDetailPage() {
 
   // 게시글이 7일 연속으로 작성되었는지 확인하는 함수
   const checkConsecutivePosts = (posts) => {
-    const dates = posts.map((post) => new Date(post.createdAt));
-    dates.sort((a, b) => a - b);
+    // 게시글 작성 날짜를 추출하고 중복된 날짜를 제거
+    const dates = Array.from(
+      new Set(
+        posts.map((post) => {
+          const date = new Date(post.createdAt);
+          return date.toISOString().split("T")[0]; // YYYY-MM-DD 형식으로 변환하여 중복 제거
+        })
+      )
+    );
+
+    // 날짜를 정렬
+    dates.sort((a, b) => new Date(a) - new Date(b));
 
     let consecutiveCount = 1;
     for (let i = 1; i < dates.length; i++) {
-      const diffDays = (dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24);
+      const diffDays =
+        (new Date(dates[i]) - new Date(dates[i - 1])) / (1000 * 60 * 60 * 24);
       if (diffDays === 1) {
         consecutiveCount++;
-        if (consecutiveCount >= 7) return true;
+        if (consecutiveCount >= 7) return true; // 7일 연속일 경우 true 반환
       } else {
-        consecutiveCount = 1;
+        consecutiveCount = 1; // 연속이 끊기면 다시 초기화
       }
     }
     return false;
+  };
+
+  // 1만 개 이상의 공감을 받은 게시글이 있는지 확인하는 함수
+  const hasPostWith10kLikes = (posts) => {
+    return posts.some((post) => post.likeCount >= 10000);
   };
 
   useEffect(() => {
@@ -125,10 +141,18 @@ function GroupDetailPage() {
 
         setFilteredMemories(response.data);
 
+        // 공감 1만 개 이상의 게시글이 있는지 확인
+        const hasPopularPost = hasPostWith10kLikes(response.data);
+        if (hasPopularPost) {
+          // 1만 개 이상의 공감을 받은 게시글이 있을 때 실행할 코드
+          console.log("1만 개 이상의 공감을 받은 게시글이 있습니다!");
+        }
+
         // 게시글 수 업데이트
         setGroupDetail((prevDetail) => ({
           ...prevDetail,
           postCount: response.data.length,
+          postList: response.data,
         }));
       } catch (err) {
         setError("게시글 목록을 불러오는 중 오류가 발생했습니다.");
@@ -249,31 +273,36 @@ function GroupDetailPage() {
             <div className={styles.badgesSection}>
               <div className={styles.badgesTitle}>획득 배지</div>
               <div className={styles.badges}>
-                {groupDetail.likeCount >= 10000 && (
-                  <img
-                    src={GroupLikeBadge}
-                    className={styles.badge}
-                    alt="그룹 공감 1만 배지"
-                  />
-                )}
-
-                {checkConsecutivePosts(filteredMemories) && (
-                  <img
-                    src={PostBadge}
-                    className={styles.badge}
-                    alt="7일 연속 게시글 배지"
-                  />
-                )}
-
-                {groupDetail.postLikeCount >= 10000 && (
-                  <img
-                    src={PostLikeBadge}
-                    className={styles.badge}
-                    alt="게시글 공감 1만 배지"
-                  />
-                )}
+                {
+                  // 조건에 따라 보여줄 배지들을 순서대로 배열에 넣음
+                  [
+                    groupDetail.likeCount >= 10000 && {
+                      src: GroupLikeBadge,
+                      alt: "그룹 공감 1만 배지",
+                    },
+                    checkConsecutivePosts(filteredMemories) && {
+                      src: PostBadge,
+                      alt: "7일 연속 게시글 배지",
+                    },
+                    hasPostWith10kLikes(groupDetail.postList) && {
+                      src: PostLikeBadge,
+                      alt: "게시글 공감 1만 배지",
+                    },
+                  ]
+                    // 조건에 맞는 배지들만 필터링하고 렌더링
+                    .filter(Boolean)
+                    .map((badge, index) => (
+                      <img
+                        key={index}
+                        src={badge.src}
+                        className={styles.badge}
+                        alt={badge.alt}
+                      />
+                    ))
+                }
               </div>
             </div>
+
             <LikeButtonIcon
               className={styles.likeButton}
               onClick={handleLikeClick}
