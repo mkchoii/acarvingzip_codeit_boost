@@ -62,7 +62,7 @@ groupController.post('/', async (req, res) => {
 // 그룹 목록 조회 라우터
 groupController.get('/', async (req, res) => {
     const { page = 1, pageSize = 10, sortBy = 'mostLiked', keyword = '', isPublic } = req.query; // 쿼리 파라미터 받기
-    let sql = 'SELECT * FROM groups';
+    let sql = 'SELECT *, (SELECT COUNT(*) FROM posts WHERE groupId = groups.id) AS postCount FROM groups';
     const params = [];
     let whereClauseAdded = false; // WHERE 절이 추가되었는지 여부를 체크하는 변수
 
@@ -81,9 +81,9 @@ groupController.get('/', async (req, res) => {
 
     // 정렬 기준 설정
     const sortOrder = sortBy === 'latest' ? 'createdAt DESC'
-                    : sortBy === 'mostPosted' ? '(SELECT COUNT(*) FROM posts WHERE groupId = groups.id) DESC'
+                    : sortBy === 'mostPosted' ? 'postCount DESC' // 수정된 부분
                     : sortBy === 'mostBadge' ? 'badges DESC'
-                    : 'likes DESC'; // 기본값: 공감순
+                    : 'likeCount DESC'; // 기본값: 공감순
 
     sql += ` ORDER BY ${sortOrder}`; // 정렬 기준 추가
 
@@ -103,25 +103,9 @@ groupController.get('/', async (req, res) => {
             });
         });
 
-        // 게시글 수를 비동기로 가져오는 Promise 배열 생성
-        const postCountPromises = rows.map(row => {
-            return new Promise((resolve, reject) => {
-                db.get('SELECT COUNT(*) as postCount FROM posts WHERE groupId = ?', [row.id], (err, postRow) => {
-                    if (err) {
-                        console.error("게시글 수 조회 오류:", err.message);
-                        return resolve(0); // 오류 발생 시 0으로 설정
-                    }
-                    resolve(postRow.postCount);
-                });
-            });
-        });
-
-        // 모든 게시글 수를 비동기로 가져옴
-        const postCounts = await Promise.all(postCountPromises);
-
         // 디데이 계산
         const currentDate = new Date();
-        const responseRows = rows.map((row, index) => {
+        const responseRows = rows.map(row => {
             const createdAt = new Date(row.createdAt);
             const diffTime = Math.abs(currentDate - createdAt);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -133,9 +117,9 @@ groupController.get('/', async (req, res) => {
                 description: row.description,
                 isPublic: row.isPublic,
                 dDay: diffDays,
-                badges: row.badges ? row.badges.split(',').length : 0, // 배지 개수
-                posts: postCounts[index],
-                likes: row.likes
+                badgeCount: row.badges ? row.badges.split(',').length : 0, // 배지 개수
+                postCount: row.postCount, // 수정된 부분
+                likeCount: row.likeCount // 수정된 부분
             };
         });
 
@@ -155,7 +139,7 @@ groupController.get('/', async (req, res) => {
 groupController.post('/:groupId/like', (req, res) => {
     const { groupId } = req.params;
 
-    const sql = 'UPDATE groups SET likes = likes + 1 WHERE id = ?';
+    const sql = 'UPDATE groups SET likeCount = likeCount + 1 WHERE id = ?';
     db.run(sql, [groupId], async function(err) {
         if (err) {
             console.error("공감 추가 오류:", err.message);
@@ -163,13 +147,13 @@ groupController.post('/:groupId/like', (req, res) => {
         }
 
         // 배지 획득 여부 확인
-        const badgeCheckSql = 'SELECT badges, likes FROM groups WHERE id = ?';
+        const badgeCheckSql = 'SELECT badges, likeCount FROM groups WHERE id = ?';
         db.get(badgeCheckSql, [groupId], (err, row) => {
             if (err) {
                 console.error("배지 조회 오류:", err.message);
             } else {
                 // 배지가 없고 공감 수가 10,000개 이상일 때만 '인기 그룹' 배지 증가
-                if (!row.badges.includes('인기 그룹') && row.likes >= 10000) {
+                if (!row.badges.includes('인기 그룹') && row.likeCount >= 10000) {
                     const badgeName = '인기 그룹'; // 배지 이름 설정
                     const badgeUpdateSql = `
                         UPDATE groups 
@@ -364,9 +348,9 @@ groupController.get('/:id', async (req, res) => {
             isPublic: group.isPublic,
             dDay: diffDays,
             badges: badges,
-            posts: postCount, // 게시글 수
+            postCount: postCount, // 수정된 필드명
             postList: posts, // 게시물 목록
-            likes: group.likes // 그룹 공감수
+            likeCount: group.likeCount // 수정된 필드명
         };
 
         res.status(200).json(response);

@@ -15,7 +15,7 @@ const createGroupsTable = () => {
             description TEXT,
             isPublic BOOLEAN NOT NULL,
             password TEXT NOT NULL,
-            likes INTEGER DEFAULT 0, 
+            likeCount INTEGER DEFAULT 0, 
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP, 
             badges TEXT DEFAULT '',  -- 배지를 문자열로 저장
             postCount INTEGER DEFAULT 0 
