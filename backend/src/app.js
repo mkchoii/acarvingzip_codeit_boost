@@ -5,6 +5,7 @@ const groupController = require('./controllers/groupController');
 const postController = require('./controllers/postController'); 
 const imageController = require('./controllers/imageController');
 const commentController = require('./controllers/commentController'); 
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -12,6 +13,7 @@ const port = process.env.PORT || 4000;
 // 미들웨어 설정
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 
 // API 라우터 설정
 app.use('/api/groups', groupController);
