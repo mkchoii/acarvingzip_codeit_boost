@@ -1,13 +1,16 @@
 // 그룹 등록
 export const createGroup = async (groupData) => {
   try {
-    const response = await fetch("/api/groups", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(groupData), // JSON 문자열로 변환하여 전송
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/groups`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(groupData), // JSON 문자열로 변환하여 전송
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text(); // 응답이 JSON이 아니면 텍스트로 에러 확인
@@ -41,9 +44,12 @@ export const fetchGroups = async (
     if (typeof isPublic === "boolean")
       queryParams.append("isPublic", isPublic.toString());
 
-    const response = await fetch(`/api/groups?${queryParams.toString()}`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/groups?${queryParams.toString()}`,
+      {
+        method: "GET",
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -61,13 +67,16 @@ export const fetchGroups = async (
 // 비공개 그룹 접근 권한 확인
 export const checkPrivateGroupAccess = async (groupId, password) => {
   try {
-    const response = await fetch(`/api/groups/${groupId}/verify-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ password }),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/groups/${groupId}/verify-password`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -87,9 +96,12 @@ export const checkPrivateGroupAccess = async (groupId, password) => {
 // 그룹 상세 정보 조회
 export const fetchGroupDetail = async (groupId) => {
   try {
-    const response = await fetch(`/api/groups/${groupId}`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/groups/${groupId}`,
+      {
+        method: "GET",
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 400) {
@@ -109,13 +121,16 @@ export const fetchGroupDetail = async (groupId) => {
 // 그룹 수정
 export const updateGroup = async (groupId, groupData) => {
   try {
-    const response = await fetch(`/api/groups/${groupId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(groupData),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/groups/${groupId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(groupData),
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -141,13 +156,16 @@ export const updateGroup = async (groupId, groupData) => {
 // 그룹 삭제
 export const deleteGroup = async (groupId, password) => {
   try {
-    const response = await fetch(`/api/groups/${groupId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ password }), // 비밀번호
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/groups/${groupId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }), // 비밀번호
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -173,9 +191,12 @@ export const deleteGroup = async (groupId, password) => {
 // 그룹 공감하기 버튼
 export const likeGroup = async (groupId) => {
   try {
-    const response = await fetch(`/api/groups/${groupId}/like`, {
-      method: "POST",
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/groups/${groupId}/like`,
+      {
+        method: "POST",
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 404) {

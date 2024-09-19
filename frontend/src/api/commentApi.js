@@ -1,13 +1,16 @@
 // 댓글 등록
 export const registerComment = async (postId, commentData) => {
   try {
-    const response = await fetch(`/api/posts/${postId}/comments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(commentData), // commentData는 nickname, content, password가 포함
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}/comments`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(commentData), // commentData는 nickname, content, password가 포함
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -33,7 +36,9 @@ export const fetchComments = async (postId, page, pageSize) => {
     });
 
     const response = await fetch(
-      `/api/posts/${postId}/comments?${queryParams.toString()}`,
+      `${
+        process.env.REACT_APP_API_URL
+      }/api/posts/${postId}/comments?${queryParams.toString()}`,
       {
         method: "GET",
       }
@@ -57,13 +62,16 @@ export const fetchComments = async (postId, page, pageSize) => {
 // 댓글 수정
 export const updateComment = async (commentId, commentData) => {
   try {
-    const response = await fetch(`/api/comments/${commentId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(commentData),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/comments/${commentId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(commentData),
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -87,13 +95,16 @@ export const updateComment = async (commentId, commentData) => {
 // 댓글 삭제
 export const deleteComment = async (commentId, password) => {
   try {
-    const response = await fetch(`/api/comments/${commentId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ password }),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/comments/${commentId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();

@@ -1,9 +1,9 @@
-// 이미지 업로드 api 함수
+// 이미지 업로드 API 함수
 export const uploadImage = async (file) => {
   const formData = new FormData();
   formData.append("image", file); // 서버가 기대하는 "image" 필드에 파일 추가
 
-  const response = await fetch("/api/image", {
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/api/image`, {
     method: "POST",
     headers: {
       // 'Content-Type'은 명시적으로 설정하지 않음.

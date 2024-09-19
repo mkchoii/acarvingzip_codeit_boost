@@ -1,13 +1,16 @@
 // 게시글 생성 (추억 올리기)
 export const createPost = async (groupId, postData) => {
   try {
-    const response = await fetch(`/api/groups/${groupId}/posts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(postData),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/groups/${groupId}/posts`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 400) {
@@ -45,7 +48,7 @@ export const fetchPostList = async ({
     }).toString();
 
     const response = await fetch(
-      `/api/groups/${groupId}/posts?${queryParams}`,
+      `${process.env.REACT_APP_API_URL}/api/groups/${groupId}/posts?${queryParams}`,
       {
         method: "GET",
         headers: {
@@ -69,13 +72,16 @@ export const fetchPostList = async ({
 // 비공개 게시글 접근 권한 확인
 export const checkPrivatePostAccess = async (postId, password) => {
   try {
-    const response = await fetch(`/api/posts/${postId}/verify-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ password }),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}/verify-password`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 401) {
@@ -96,12 +102,15 @@ export const checkPrivatePostAccess = async (postId, password) => {
 // 게시글 상세 정보 조회
 export const getPostDetail = async (postId) => {
   try {
-    const response = await fetch(`/api/posts/${postId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 400) {
@@ -122,12 +131,15 @@ export const getPostDetail = async (postId) => {
 // 게시글 공감하기
 export const likePost = async (postId) => {
   try {
-    const response = await fetch(`/api/posts/${postId}/like`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}/like`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -148,13 +160,16 @@ export const likePost = async (postId) => {
 // 게시글 삭제
 export const deletePost = async (postId, postPassword) => {
   try {
-    const response = await fetch(`/api/posts/${postId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ postPassword }),
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/posts/${postId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ postPassword }),
+      }
+    );
 
     // 응답 처리
     if (response.ok) {
@@ -180,7 +195,7 @@ export const deletePost = async (postId, postPassword) => {
 
 // 게시글 수정하기
 export const updatePost = async (postId, postData) => {
-  const url = `/api/posts/${postId}`;
+  const url = `${process.env.REACT_APP_API_URL}/api/posts/${postId}`;
 
   try {
     const response = await fetch(url, {
