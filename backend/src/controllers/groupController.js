@@ -114,7 +114,7 @@ groupController.get('/', async (req, res) => {
                 id: row.id,
                 name: row.name,
                 imageUrl: row.imageUrl,
-                description: row.description,
+                introduction: row.introduction,
                 isPublic: row.isPublic,
                 dDay: diffDays,
                 badgeCount: row.badges ? row.badges.split(',').length : 0, // 배지 개수
@@ -344,7 +344,7 @@ groupController.get('/:id', async (req, res) => {
             id: group.id,
             name: group.name,
             imageUrl: group.imageUrl,
-            description: group.description,
+            introduction: group.introduction,
             isPublic: group.isPublic,
             dDay: diffDays,
             badges: badges,
