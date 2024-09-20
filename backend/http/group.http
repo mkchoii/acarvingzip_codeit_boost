@@ -6,7 +6,7 @@ Content-Type: application/json
 	"name": "JohnDoe",
 	"password": "1234",
 	"imageUrl": "http://example.com/image.jpg",
-	"description": "example",
+	"introduction": "example",
 	"isPublic": true
 }
 
@@ -18,7 +18,7 @@ Content-Type: application/json
 	"name": "Donald",
 	"password": "1234",
 	"imageUrl": "http://example.com/image.jpg",
-	"description": "example change",
+	"introducton": "example change",
 	"isPublic": true
 }
 
@@ -31,7 +31,7 @@ Content-Type: application/json
 }
 
 ### 그룹 공감하기
-POST http://localhost:4000/api/groups/2/like
+POST http://localhost:4000/api/groups/6/like
 Content-Type: application/json
 
 ### 공개 그룹(기본값) 목록 조회 (정렬 기본값: 공감순)
@@ -59,7 +59,7 @@ GET http://localhost:4000/api/groups?name=Joh
 Content-Type: application/json
 
 ### 그룹 상세 조회
-GET http://localhost:4000/api/groups/2
+GET http://localhost:4000/api/groups/6
 Content-Type: application/json
 
 ### 비공개 그룹 권환 조회
